@@ -1,15 +1,15 @@
 {
   "det": 1.0,
-  "rubric": 0.6178,
-  "process": 0.8089,
-  "process_stratified": 0.9617,
+  "rubric": 0.6478,
+  "process": 0.8239,
+  "process_stratified": 0.9619,
   "outcome": 0.0,
   "gate": 1,
   "alpha": 0.05,
-  "score_eval": 0.0809,
+  "score_eval": 0.0824,
   "score_rl": 0.0962,
-  "stratum_size": 9,
-  "rubric_raw": 0.5977,
+  "stratum_size": 8,
+  "rubric_raw": 0.6293,
   "outcome_detail": {
     "recall": 0.0,
     "factor": 1.0,
@@ -19,10 +19,9 @@
     "preserve": 3
   },
   "rubric_weight": 1.0,
-  "scorer": "SCORE_MATH.md (2026-08-13 single-judge revision)",
   "rubric_detail": {
     "denominator": 0.7125,
-    "numerator": 0.42584670231729055,
+    "numerator": 0.44834670231729057,
     "guardrails_fired": []
   },
   "checks": [
@@ -119,8 +118,8 @@
     },
     {
       "item_id": "R6",
-      "resolution": "failed",
-      "rationale": "unanimous not-satisfied across 1 citing verdict(s)"
+      "resolution": "satisfied",
+      "rationale": "unanimous satisfied across 1 citing verdict(s)"
     },
     {
       "item_id": "R7",
@@ -213,6 +212,6 @@
       "rationale": "unanimous not-satisfied across 1 citing verdict(s)"
     }
   ],
-  "bundle_fingerprint": "a695a1387aaf904d",
+  "bundle_fingerprint": "5711545c3d408c0d",
   "judge_model": "gpt-5.6-sol"
 }

@@ -182,17 +182,17 @@
   "step_results": null,
   "score_outcome": 0.0,
   "score_deterministic": 1.0,
-  "score_rubric": 0.5316,
-  "score_process": 0.7658,
-  "score_eval": 0.0766,
-  "score_rl": 0.0564,
+  "score_rubric": 0.5616,
+  "score_process": 0.7808,
+  "score_eval": 0.0781,
+  "score_rl": 0.0567,
   "assay": {
     "alpha": 0.05,
     "rubric_weight": 1.0,
     "gate": 1,
-    "stratum_size": 9,
+    "stratum_size": 8,
     "judge": "gpt-5.6-sol",
     "status": "scored",
-    "bundle_fingerprint": "a695a1387aaf904d"
+    "bundle_fingerprint": "5711545c3d408c0d"
   }
 }
