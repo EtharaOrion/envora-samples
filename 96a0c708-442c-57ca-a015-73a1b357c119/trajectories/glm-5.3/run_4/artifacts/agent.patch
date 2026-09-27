@@ -1,0 +1,583 @@
+diff -ruN /opt/pristine/workspace/bubbletea/cursed_renderer.go ./cursed_renderer.go
+--- /opt/pristine/workspace/bubbletea/cursed_renderer.go	2026-09-23 13:01:16.000000000 +0000
++++ ./cursed_renderer.go	2026-09-24 20:13:03.000000000 +0000
+@@ -29,6 +29,14 @@
+ 	backspace     bool // whether to use backspace to optimize cursor movements
+ 	mapnl         bool
+ 	prependLines  []string
++
++	// altScreen and cursorVisible keep track of the terminal state this
++	// renderer last put the terminal in. The terminal renderer no longer
++	// owns this state, so we need to keep track of it ourselves to avoid
++	// emitting redundant sequences.
++	altScreen      bool
++	cursorVisible  bool
++	synchronizedOK bool // whether the terminal supports synchronized output
+ }
+ 
+ var _ renderer = &cursedRenderer{}
+@@ -77,7 +85,9 @@
+ 		enableAltScreen(s, true)
+ 	}
+ 	if s.lastView.Cursor != nil {
+-		enableTextCursor(s, true)
++		// Re-apply the cursor visibility as some terminals reset it when
++		// switching to or from the alternate screen.
++		enableTextCursor(s, true, s.altScreen)
+ 		if s.lastView.Cursor.Color != nil {
+ 			col, ok := colorful.MakeColor(s.lastView.Cursor.Color)
+ 			if ok {
+@@ -132,20 +142,20 @@
+ 	s.mu.Lock()
+ 	defer s.mu.Unlock()
+ 
+-	// Exit the altScreen and show cursor before closing. It's important that
+-	// we don't change the [cursedRenderer] altScreen and cursorHidden states
+-	// so that we can restore them when we start the renderer again. This is
+-	// used when the user suspends the program and then resumes it.
++	// Restore the terminal to its original state before closing. We keep
++	// track of the terminal state changes we make so that we can re-apply
++	// them when the renderer is started again. This is used when the user
++	// suspends the program and then resumes it.
+ 	if lv := s.lastView; lv != nil { //nolint:nestif
+ 		if lv.AltScreen {
+-			s.scr.ExitAltScreen()
++			enableAltScreen(s, false)
+ 		} else {
+ 			// Go to the bottom of the screen.
+ 			s.scr.MoveTo(0, s.buf.Height()-1)
+-			_, _ = s.scr.WriteString("\r" + ansi.EraseScreenBelow)
++			_, _ = s.scr.WriteString(ansi.EraseScreenBelow)
+ 		}
+ 		if lv.Cursor == nil {
+-			s.scr.ShowCursor()
++			enableTextCursor(s, true, false)
+ 		}
+ 		if !lv.DisableBracketedPasteMode {
+ 			_, _ = s.scr.WriteString(ansi.ResetBracketedPasteMode)
+@@ -227,10 +237,34 @@
+ 		return nil
+ 	}
+ 
++	// Start of an atomic screen update. When the terminal supports
++	// synchronized output, bracket the whole update with the mode's begin
++	// and end markers so that nothing half-drawn is ever displayed.
++	if s.synchronizedOK {
++		_, _ = s.scr.WriteString(ansi.SetModeSynchronizedOutput)
++	}
++
+ 	// Alt screen mode.
++	altScreenChanged := view.AltScreen != s.altScreen
+ 	enableAltScreen(s, view.AltScreen)
++
+ 	// Cursor visibility.
+-	enableTextCursor(s, view.Cursor != nil)
++	//
++	// When synchronized output is not in use, the cursor is hidden while the
++	// update is being drawn and shown again once it's done. Hiding is only
++	// necessary when the cursor is currently visible; when the new frame has
++	// no cursor, the cursor is simply left hidden.
++	hideCursorForUpdate := !s.synchronizedOK && s.cursorVisible
++	if hideCursorForUpdate {
++		_, _ = s.scr.WriteString(ansi.HideCursor)
++		s.cursorVisible = false
++	} else {
++		// Apply the new cursor visibility state, if it changed. A visible
++		// cursor is also re-applied when the alternate screen changes as
++		// some terminals reset the cursor visibility when switching to or
++		// from the alternate screen.
++		enableTextCursor(s, view.Cursor != nil, altScreenChanged && view.Cursor != nil)
++	}
+ 
+ 	// Push prepended lines if any.
+ 	if len(s.prependLines) > 0 {
+@@ -388,6 +422,16 @@
+ 		}
+ 	}
+ 
++	// End of the atomic screen update started above. When synchronized
++	// output is in use, end the batch. Otherwise, restore the text cursor if
++	// we hid it for the duration of the update and the new frame has one.
++	if s.synchronizedOK {
++		_, _ = s.scr.WriteString(ansi.ResetModeSynchronizedOutput)
++	} else if hideCursorForUpdate && view.Cursor != nil {
++		_, _ = s.scr.WriteString(ansi.ShowCursor)
++		s.cursorVisible = true
++	}
++
+ 	if err := s.scr.Flush(); err != nil {
+ 		return fmt.Errorf("bubbletea: error flushing screen writer: %w", err)
+ 	}
+@@ -492,19 +536,21 @@
+ 	scr.SetBackspace(s.backspace)
+ 	scr.SetMapNewline(s.mapnl)
+ 	scr.SetLogger(s.logger)
+-	if s.lastView != nil && s.lastView.AltScreen {
+-		scr.EnterAltScreen()
+-	} else {
+-		scr.ExitAltScreen()
+-	}
+-	if s.lastView != nil && s.lastView.Cursor != nil {
+-		scr.ShowCursor()
+-	} else {
+-		scr.HideCursor()
+-	}
++	// The alternate screen and cursor visibility states are kept as is so
++	// that the renderer can re-apply them when it is started again. This is
++	// used when the user suspends the program and then resumes it.
+ 	s.scr = scr
+ }
+ 
++// setSynchronizedOutput enables synchronized output (mode 2026) on the
++// renderer. When enabled, screen updates are bracketed with the mode's begin
++// and end markers so that they are presented to the user as a single frame.
++func (s *cursedRenderer) setSynchronizedOutput(enable bool) {
++	s.mu.Lock()
++	s.synchronizedOK = enable
++	s.mu.Unlock()
++}
++
+ // setColorProfile implements renderer.
+ func (s *cursedRenderer) setColorProfile(p colorprofile.Profile) {
+ 	s.mu.Lock()
+@@ -546,48 +592,38 @@
+ 
+ // enableAltScreen sets the alt screen mode.
+ func enableAltScreen(s *cursedRenderer, enable bool) {
+-	if enable {
+-		s.scr.EnterAltScreen()
+-	} else {
+-		s.scr.ExitAltScreen()
++	if enable != s.altScreen {
++		if enable {
++			s.scr.EnterAltScreen()
++		} else {
++			s.scr.ExitAltScreen()
++		}
++		s.altScreen = enable
+ 	}
+ 	s.scr.SetRelativeCursor(!enable)
+ }
+ 
+-// enterAltScreen implements renderer.
+-func (s *cursedRenderer) enterAltScreen() {
+-	s.mu.Lock()
+-	enableAltScreen(s, true)
+-	s.mu.Unlock()
+-}
+-
+-// exitAltScreen implements renderer.
+-func (s *cursedRenderer) exitAltScreen() {
+-	s.mu.Lock()
+-	enableAltScreen(s, false)
+-	s.mu.Unlock()
+-}
+-
+-// enableTextCursor sets the text cursor mode.
+-func enableTextCursor(s *cursedRenderer, enable bool) {
++// enableTextCursor sets the text cursor mode. The terminal state is only
++// updated when the visibility changes, unless force is set, in which case the
++// visibility is re-applied. This is needed when switching to or from the
++// alternate screen as some terminals reset the cursor visibility when doing
++// so.
++func enableTextCursor(s *cursedRenderer, enable, force bool) {
++	if !force && enable == s.cursorVisible {
++		return
++	}
+ 	if enable {
+-		s.scr.ShowCursor()
++		_, _ = s.scr.WriteString(ansi.ShowCursor)
+ 	} else {
+-		s.scr.HideCursor()
++		_, _ = s.scr.WriteString(ansi.HideCursor)
+ 	}
++	s.cursorVisible = enable
+ }
+ 
+-// showCursor implements renderer.
+-func (s *cursedRenderer) showCursor() {
+-	s.mu.Lock()
+-	enableTextCursor(s, true)
+-	s.mu.Unlock()
+-}
+-
+-// hideCursor implements renderer.
+-func (s *cursedRenderer) hideCursor() {
++// setCursorVisible implements renderer.
++func (s *cursedRenderer) setCursorVisible(visible bool) {
+ 	s.mu.Lock()
+-	enableTextCursor(s, false)
++	enableTextCursor(s, visible, false)
+ 	s.mu.Unlock()
+ }
+ 
+@@ -604,7 +640,7 @@
+ 		// If the line is wider than the screen, truncate it.
+ 		strLines[i] = ansi.Truncate(line, s.width, "")
+ 	}
+-	s.scr.PrependString(strings.Join(strLines, "\n"))
++	s.scr.PrependString(s.buf.Buffer, strings.Join(strLines, "\n"))
+ }
+ 
+ func setProgressBar(s *cursedRenderer, pb *ProgressBar) {
+diff -ruN /opt/pristine/workspace/bubbletea/go.mod ./go.mod
+--- /opt/pristine/workspace/bubbletea/go.mod	2026-09-23 13:01:23.000000000 +0000
++++ ./go.mod	2026-09-24 20:12:07.000000000 +0000
+@@ -8,8 +8,8 @@
+ 
+ require (
+ 	github.com/charmbracelet/colorprofile v0.3.3
+-	github.com/charmbracelet/ultraviolet v0.0.0-20251112162901-46098fed0961
+-	github.com/charmbracelet/x/ansi v0.11.1-0.20251110210702-903592506081
++	github.com/charmbracelet/ultraviolet v0.0.0-20251114211333-9deacb990ee7
++	github.com/charmbracelet/x/ansi v0.11.1
+ 	github.com/charmbracelet/x/exp/golden v0.0.0-20241212170349-ad4b7ae0f25f
+ 	github.com/charmbracelet/x/term v0.2.2
+ 	github.com/lucasb-eyer/go-colorful v1.3.0
+diff -ruN /opt/pristine/workspace/bubbletea/go.sum ./go.sum
+--- /opt/pristine/workspace/bubbletea/go.sum	2026-09-23 13:01:23.000000000 +0000
++++ ./go.sum	2026-09-24 20:12:07.000000000 +0000
+@@ -2,10 +2,10 @@
+ github.com/aymanbagabas/go-udiff v0.2.0/go.mod h1:RE4Ex0qsGkTAJoQdQQCA0uG+nAzJO/pI/QwceO5fgrA=
+ github.com/charmbracelet/colorprofile v0.3.3 h1:DjJzJtLP6/NZ8p7Cgjno0CKGr7wwRJGxWUwh2IyhfAI=
+ github.com/charmbracelet/colorprofile v0.3.3/go.mod h1:nB1FugsAbzq284eJcjfah2nhdSLppN2NqvfotkfRYP4=
+-github.com/charmbracelet/ultraviolet v0.0.0-20251112162901-46098fed0961 h1:qneAb6lrvZEaliI3g91vFDYf4kCpotKU0bRXijfHRqA=
+-github.com/charmbracelet/ultraviolet v0.0.0-20251112162901-46098fed0961/go.mod h1:ung4G52QJm6rlFYPYqPelzBHWWy966P9VMonX7UGT5g=
+-github.com/charmbracelet/x/ansi v0.11.1-0.20251110210702-903592506081 h1:gWeRo2N77OeiZAL47lzvIot9VPpTzxT5ahdzQIyHEDY=
+-github.com/charmbracelet/x/ansi v0.11.1-0.20251110210702-903592506081/go.mod h1:M49wjzpIujwPceJ+t5w3qh2i87+HRtHohgb5iTyepL0=
++github.com/charmbracelet/ultraviolet v0.0.0-20251114211333-9deacb990ee7 h1:PeoXe8fG5yb6uaimw4Om9eiXL74MzFSwSj3coBtDPmY=
++github.com/charmbracelet/ultraviolet v0.0.0-20251114211333-9deacb990ee7/go.mod h1:6lfcr3MNP+kZR25sF1nQwJFuQnNYBlFy3PGX5rvslXc=
++github.com/charmbracelet/x/ansi v0.11.1 h1:iXAC8SyMQDJgtcz9Jnw+HU8WMEctHzoTAETIeA3JXMk=
++github.com/charmbracelet/x/ansi v0.11.1/go.mod h1:M49wjzpIujwPceJ+t5w3qh2i87+HRtHohgb5iTyepL0=
+ github.com/charmbracelet/x/exp/golden v0.0.0-20241212170349-ad4b7ae0f25f h1:UytXHv0UxnsDFmL/7Z9Q5SBYPwSuRLXHbwx+6LycZ2w=
+ github.com/charmbracelet/x/exp/golden v0.0.0-20241212170349-ad4b7ae0f25f/go.mod h1:wDlXFlCrmJ8J+swcL/MnGUuYnqgQdW9rhSD61oNMb6U=
+ github.com/charmbracelet/x/term v0.2.2 h1:xVRT/S2ZcKdhhOuSP4t5cLi5o+JxklsoEObBSgfgZRk=
+diff -ruN /opt/pristine/workspace/bubbletea/input.go ./input.go
+--- /opt/pristine/workspace/bubbletea/input.go	2026-09-23 13:01:16.000000000 +0000
++++ ./input.go	2026-09-24 19:56:21.000000000 +0000
+@@ -45,6 +45,8 @@
+ 		return CapabilityMsg(e)
+ 	case uv.TerminalVersionEvent:
+ 		return TerminalVersionMsg(e)
++	case uv.ModeReportEvent:
++		return ModeReportMsg(e)
+ 	case uv.KeyboardEnhancementsEvent:
+ 		return KeyboardEnhancementsMsg(e)
+ 	}
+diff -ruN /opt/pristine/workspace/bubbletea/modereport.go ./modereport.go
+--- /opt/pristine/workspace/bubbletea/modereport.go	1970-01-01 00:00:00.000000000 +0000
++++ ./modereport.go	2026-09-24 19:56:34.000000000 +0000
+@@ -0,0 +1,14 @@
++package tea
++
++import (
++	uv "github.com/charmbracelet/ultraviolet"
++)
++
++// ModeReportMsg is a message that represents a terminal mode report (DECRPM)
++// event. Terminals send these reports in response to mode queries such as
++// [ansi.RequestModeSynchronizedOutput].
++//
++// Bubble Tea uses this message to detect support for synchronized output
++// (DEC mode 2026), which allows it to paint frames atomically, without any
++// intermediate half-drawn states being displayed.
++type ModeReportMsg uv.ModeReportEvent
+diff -ruN /opt/pristine/workspace/bubbletea/nil_renderer.go ./nil_renderer.go
+--- /opt/pristine/workspace/bubbletea/nil_renderer.go	2026-09-23 13:01:16.000000000 +0000
++++ ./nil_renderer.go	2026-09-24 19:55:51.000000000 +0000
+@@ -16,15 +16,6 @@
+ // clearScreen implements renderer.
+ func (n nilRenderer) clearScreen() {}
+ 
+-// enterAltScreen implements renderer.
+-func (n nilRenderer) enterAltScreen() {}
+-
+-// exitAltScreen implements renderer.
+-func (n nilRenderer) exitAltScreen() {}
+-
+-// hideCursor implements renderer.
+-func (n nilRenderer) hideCursor() {}
+-
+ // insertAbove implements renderer.
+ func (n nilRenderer) insertAbove(string) {}
+ 
+@@ -34,8 +25,8 @@
+ // setColorProfile implements renderer.
+ func (n nilRenderer) setColorProfile(colorprofile.Profile) {}
+ 
+-// showCursor implements renderer.
+-func (n nilRenderer) showCursor() {}
++// setCursorVisible implements renderer.
++func (n nilRenderer) setCursorVisible(bool) {}
+ 
+ // flush implements the Renderer interface.
+ func (nilRenderer) flush(bool) error { return nil }
+@@ -52,5 +43,8 @@
+ // writeString implements the Renderer interface.
+ func (nilRenderer) writeString(string) (int, error) { return 0, nil }
+ 
++// setSynchronizedOutput implements renderer.
++func (nilRenderer) setSynchronizedOutput(bool) {}
++
+ // hit implements the Renderer interface.
+ func (n nilRenderer) hit(MouseMsg) []Msg { return nil }
+diff -ruN /opt/pristine/workspace/bubbletea/renderer.go ./renderer.go
+--- /opt/pristine/workspace/bubbletea/renderer.go	2026-09-23 13:01:16.000000000 +0000
++++ ./renderer.go	2026-09-24 19:55:47.000000000 +0000
+@@ -36,17 +36,8 @@
+ 	// insertAbove inserts unmanaged lines above the renderer.
+ 	insertAbove(string)
+ 
+-	// enterAltScreen enters the alternate screen buffer.
+-	enterAltScreen()
+-
+-	// exitAltScreen exits the alternate screen buffer.
+-	exitAltScreen()
+-
+-	// showCursor shows the cursor.
+-	showCursor()
+-
+-	// hideCursor hides the cursor.
+-	hideCursor()
++	// setCursorVisible sets the visibility of the cursor.
++	setCursorVisible(bool)
+ 
+ 	// resize notify the renderer of a terminal resize.
+ 	resize(int, int)
+@@ -58,6 +49,10 @@
+ 	clearScreen()
+ 
+ 	writeString(string) (int, error)
++
++	// setSynchronizedOutput enables or disables synchronized output
++	// (DECSET 2026) on the renderer.
++	setSynchronizedOutput(bool)
+ }
+ 
+ type printLineMessage struct {
+diff -ruN /opt/pristine/workspace/bubbletea/tea.go ./tea.go
+--- /opt/pristine/workspace/bubbletea/tea.go	2026-09-23 13:01:16.000000000 +0000
++++ ./tea.go	2026-09-24 19:55:59.000000000 +0000
+@@ -756,6 +756,14 @@
+ 					}
+ 				}
+ 
++			case ModeReportMsg:
++				// The terminal replied to our synchronized output query (DECRPM
++				// for DEC mode 2026). Only enable the mode when the terminal
++				// supports it and it is currently turned off.
++				if msg.Mode == ansi.ModeSynchronizedOutput && msg.Value.IsReset() {
++					p.renderer.setSynchronizedOutput(true)
++				}
++
+ 			case MouseMsg:
+ 				for _, m := range p.renderer.hit(msg) {
+ 					go p.Send(m) // send hit messages
+@@ -1016,7 +1024,14 @@
+ 
+ 	// Hide the cursor before starting the renderer. This is handled by the
+ 	// renderer so we don't need to write the sequence here.
+-	p.renderer.hideCursor()
++	p.renderer.setCursorVisible(false)
++
++	// Query the terminal for synchronized output support. The renderer will
++	// use it to draw frames atomically if the terminal reports the mode as
++	// supported.
++	if p.querySyncOutput() {
++		p.execute(ansi.RequestModeSynchronizedOutput)
++	}
+ 
+ 	// Start the renderer.
+ 	p.startRenderer()
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestClearMsg/bg_fg_cur_color.golden ./testdata/TestClearMsg/bg_fg_cur_color.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestClearMsg/bg_fg_cur_color.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestClearMsg/bg_fg_cur_color.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h]10;?]11;?]12;?
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p]10;?]11;?]12;?
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestClearMsg/clear_screen.golden ./testdata/TestClearMsg/clear_screen.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestClearMsg/clear_screen.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestClearMsg/clear_screen.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l
+[?2004h[=1;1u[Jsuccess[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++
+[?2004h[=1;1u[Jsuccess
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestClearMsg/read_set_clipboard.golden ./testdata/TestClearMsg/read_set_clipboard.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestClearMsg/read_set_clipboard.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestClearMsg/read_set_clipboard.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h]52;c;?]52;c;c3VjY2Vzcw==
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p]52;c;?]52;c;c3VjY2Vzcw==
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/altscreen.golden ./testdata/TestViewModel/altscreen.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/altscreen.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/altscreen.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/altscreen_autoexit.golden ./testdata/TestViewModel/altscreen_autoexit.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/altscreen_autoexit.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/altscreen_autoexit.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?1049h[?2004h[=1;1u[H[2Jsuccess[?25l[?1049l[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?1049h[?2004h[=1;1u[H[2Jsuccess[?1049l[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/bg_set_color.golden ./testdata/TestViewModel/bg_set_color.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/bg_set_color.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/bg_set_color.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/bp_stop_start.golden ./testdata/TestViewModel/bp_stop_start.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/bp_stop_start.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/bp_stop_start.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/cursor_hide.golden ./testdata/TestViewModel/cursor_hide.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/cursor_hide.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/cursor_hide.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/cursor_hideshow.golden ./testdata/TestViewModel/cursor_hideshow.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/cursor_hideshow.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/cursor_hideshow.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/kitty_stop_startreleases.golden ./testdata/TestViewModel/kitty_stop_startreleases.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/kitty_stop_startreleases.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/kitty_stop_startreleases.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/mouse_allmotion.golden ./testdata/TestViewModel/mouse_allmotion.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/mouse_allmotion.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/mouse_allmotion.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/mouse_cellmotion.golden ./testdata/TestViewModel/mouse_cellmotion.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/mouse_cellmotion.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/mouse_cellmotion.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/testdata/TestViewModel/mouse_disable.golden ./testdata/TestViewModel/mouse_disable.golden
+--- /opt/pristine/workspace/bubbletea/testdata/TestViewModel/mouse_disable.golden	2026-09-23 13:01:16.000000000 +0000
++++ ./testdata/TestViewModel/mouse_disable.golden	2026-09-24 19:59:43.000000000 +0000
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u
+success[?25l
+
+[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u
+success
+[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff -ruN /opt/pristine/workspace/bubbletea/tty.go ./tty.go
+--- /opt/pristine/workspace/bubbletea/tty.go	2026-09-23 13:01:16.000000000 +0000
++++ ./tty.go	2026-09-24 20:08:58.000000000 +0000
+@@ -104,6 +104,24 @@
+ 	}
+ }
+ 
++// querySyncOutput reports whether the terminal should be queried for
++// synchronized output support (DEC mode 2026) on start-up.
++//
++// We default to asking, and only withhold the query for terminals we have
++// positive reason to distrust: a terminal that hasn't identified itself over
++// a remote session can't be relied upon to reply, let alone with a meaningful
++// mode report.
++func (p *Program) querySyncOutput() bool {
++	if p.environ.Getenv("SSH_TTY") != "" {
++		switch p.environ.Getenv("TERM") {
++		case "", "dumb":
++			// The terminal hasn't identified itself.
++			return false
++		}
++	}
++	return true
++}
++
+ // checkResize detects the current size of the output and informs the program
+ // via a WindowSizeMsg.
+ func (p *Program) checkResize() {

@@ -1,0 +1,113 @@
+{
+  "uuid": "96a0c708-442c-57ca-a015-73a1b357c119",
+  "dataset_id": "multirepo-tasks",
+  "task": "CrossRepo",
+  "task_type": "crossrepo",
+  "language": "go",
+  "test_lang": "go",
+  "user": "charmbracelet",
+  "repo": "bubbletea",
+  "github": "https://github.com/charmbracelet/bubbletea",
+  "workdir": "bubbletea",
+  "base_ref": "v2-exp",
+  "tests_verified": true,
+  "test_extraction_notes": "lang_pattern_ok",
+  "problem_statement": "# Use synchronized output updates when the terminal supports them\n\n## Description\n\nI want the program to stop flickering on terminals that can draw a frame atomically. Right now\nevery screen update is written with the text cursor hidden first and shown again afterwards,\nunconditionally - the portable fallback, and the only technique the renderer knows. Modern\nterminals implement synchronized output (mode 2026), which lets the whole update be marked as one\natomic batch so nothing half-drawn is ever displayed, but the program never asks whether that\nmode is available and has no way to receive the answer, so it can never use it. The renderer also\npushes each piece of an update straight to the output stream as it is produced, so even if the\nanswer arrived there is no point at which a complete update could be wrapped in anything. On top\nof that, the shared terminal-rendering library this program is built on has moved on: at the\ncommit checked out beside this repository its renderer has withdrawn some of the terminal-state\nbookkeeping it used to do on its caller's behalf, and reshaped one entry point, so the current\ncode will not even build against it.\n\n## Expected Behavior\n\n- On start-up the program asks the terminal whether synchronized output is supported, but only\n  for terminals where that answer is trustworthy - not, for example, over a remote session on a\n  terminal that has not identified itself.\n- The reply from the terminal arrives as a message the program can handle, alongside the other\n  terminal capability replies it already understands, and enabling the feature is a decision the\n  program makes when that reply says the mode exists and is currently off.\n- When synchronized output is in use, a screen update is emitted as one batch bracketed by the\n  begin and end markers for the mode, and the cursor is not hidden and shown around it.\n- When it is not in use, an update is still bracketed by hiding the text cursor and showing it\n  again - but only around a real screen update, and only when the frame before it had a visible\n  cursor: the hide goes before the update's bytes and the show after them. The write that restores\n  the terminal on the way out is not bracketed at all.\n- Alternate-screen entry and exit, text-cursor visibility and inline-versus-fullscreen positioning\n  are driven by the program itself rather than delegated, and each is emitted only when the view\n  actually changes it - no redundant repeats on unchanged updates.\n- When one update both changes the alternate screen and re-applies text-cursor visibility, the\n  alternate-screen sequence is written first and the cursor-visibility sequence after it.\n- On the way out, moving to the last line and erasing below it emits the cursor move and the erase\n  and nothing else - no extra carriage return alongside the move.\n- Default to asking: withhold the start-up query only for terminals you have positive reason to\n  distrust, and issue it through the same deferred output path the program already uses for its\n  other terminal requests, ahead of the model's own initial commands.\n- Everything that worked before keeps working: the program still runs end to end and still restores\n  the terminal on exit. The exact byte stream on a terminal without the new mode does change - the\n  redundant repeats above disappear - but what the user sees does not.\n\nThe terminal-rendering library this program depends on is checked out read-only at\n`ultraviolet`; read it to learn which pieces of terminal state its renderer no longer\nowns, and how a frame must now be handed to it, because the released module version this\nrepository currently requires still exposes the old contract and cannot tell you.\n\nThe repository is at `bubbletea`, checked out at commit\n`8f17c3584f3df68f12703cb0f5e58f482f2e5d62`.\n\n---\n\n## Workspace\n\nThe following repositories are pre-installed in your workspace and available for import:\n\n| Repository | Path |\n|---|---|\n| `charmbracelet/bubbletea` | `bubbletea` |\n| `charmbracelet/ultraviolet` | `ultraviolet` |\n",
+  "problem_statement_source": "instruction_md",
+  "pr_title": "v2: Support mode 2026 (synchronized output updates)",
+  "pr_merged_at": "2025-11-14T21:59:30Z",
+  "license": "MIT",
+  "extraction_ts": "2026-08-27T05:10:21Z",
+  "harness_stage": "input-bundle",
+  "needs_stages": [
+    "difficulty_band",
+    "human_review"
+  ],
+  "FAIL_TO_PASS": [
+    "screen_test.go::TestViewModel",
+    "screen_test.go::TestClearMsg"
+  ],
+  "PASS_TO_PASS": [
+    "tea_test.go::TestTeaModel",
+    "commands_test.go::TestBatch"
+  ],
+  "load_bearing_fact": "This task cannot be completed without reading `ultraviolet` at the pinned commit. At that commit the shared terminal renderer stops owning two pieces of terminal state it used to own on the caller's behalf, and changes the shape of a third entry point: - the methods that showed and hid the text cursor are gone outright, with nothing equivalent left on the type. The caller must now emit that control itself, at a moment of its own choosing. - alternate-screen entry and exit remain, but the flag telling the renderer to treat the screen as full rather than inline is renamed, and the renderer no longer infers the relative-cursor setting from it. The caller owns the pairing. - the call that pushes an unmanaged line above the managed frame now takes the caller's own cell buffer as a leading argument, because the renderer no longer keeps a reference to it. None of that is visible from the module version the checkout currently requires, which still carries the old contract; it is visible only in `ultraviolet`. Advancing the module requirement without reading it leaves the target uncompilable, and the compiler error names the removed methods without saying what replaced them, because nothing did. The same bump drags a second upstream module forward through minimal version selection, and that module renamed its whole family of mode-setting escape-sequence constants in the same window, so the call sites that write those sequences move too. This property must be accounted for, not changed: `ultraviolet` is read-only, and the image resolves modules from a pre-warmed offline cache holding both dependency states, with no replace directive pointing at the checkout, so the requirement really does have to move.",
+  "judge": {
+    "judge_version": "diff-judge-v2.1.0-openai",
+    "rubric_version": "quality-v1.1.0",
+    "provider": "openai",
+    "model": "gpt-5.6-sol",
+    "effort": "high",
+    "max_tokens": 12000,
+    "openai_max_tokens_field": "max_completion_tokens",
+    "openai_reasoning_effort": true,
+    "samples": 1,
+    "council": "majority",
+    "timeout_sec": 600,
+    "max_retries": 2,
+    "prompt_version": "diff-judge-prompt-v2",
+    "judged_targets": [
+      "final_diff"
+    ],
+    "trajectory_targets": [
+      "trajectory",
+      "verification_output"
+    ],
+    "caps": {
+      "tamper_zeroes_quality": true,
+      "build_failure_cap": 0.25
+    },
+    "evidence": {
+      "full_file_max_bytes": 80000,
+      "full_file_max_count": 8,
+      "diff_max_bytes": 400000,
+      "lockfile_globs": [
+        "go.sum",
+        "*.sum",
+        "package-lock.json",
+        "yarn.lock",
+        "Cargo.lock",
+        "poetry.lock",
+        "uv.lock"
+      ],
+      "exclude_full_file_dirs": [
+        "examples",
+        "tutorials",
+        "testdata",
+        "vendor"
+      ]
+    },
+    "bundle": {
+      "fingerprint": "488ddca85ef74c1d",
+      "items_digest": "d6ae2182b5c5944f2fbd34ae7f9724dd825681889dfcc559e33587b7a6f9d308",
+      "prose_digest": "80dd3e9bf8d44598efcf73bb6b886f1f98c96b49e189b24dca2290be94b36b7b",
+      "evidence_version": "fenced-evidence-v2",
+      "editable_repo": "bubbletea",
+      "sibling_repo": "ultraviolet",
+      "sibling_module": "github.com/charmbracelet/ultraviolet",
+      "note": "computed by tests/make_judge_config.py with the harness's fingerprint recipe; the verifier recomputes items_digest from rubrics.json and reports null if it no longer matches"
+    },
+    "reference_paths": [
+      "cursed_renderer.go",
+      "examples/go.mod",
+      "examples/go.sum",
+      "examples/package-manager/main.go",
+      "examples/progress-animated/main.go",
+      "examples/progress-download/main.go",
+      "examples/progress-static/main.go",
+      "go.mod",
+      "go.sum",
+      "input.go",
+      "nil_renderer.go",
+      "renderer.go",
+      "screen.go",
+      "tea.go",
+      "tutorials/go.mod",
+      "tutorials/go.sum"
+    ],
+    "repo_roots": [
+      "/workspace/ultraviolet",
+      "/workspace/bubbletea"
+    ]
+  }
+}

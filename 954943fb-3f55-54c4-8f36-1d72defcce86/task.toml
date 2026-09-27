@@ -1,0 +1,153 @@
+schema_version = "1.4"
+
+[task]
+name = "ethara/envora-pd-keyspace-error"
+project_id = "Envora-001"
+version = "1.0.0"
+
+[metadata]
+uuid = "954943fb-3f55-54c4-8f36-1d72defcce86"
+authors = [
+    { name = "suryansh@ethara.ai" },
+    { name = "sarvex@ethara.ai" },
+    { name = "gurpreet.singh2037@ethara.ai" },
+    { name = "navya.arora@ethara.ai" },
+    { name = "supriya.verma@ethara.ai" },
+    { name = "kanishk.singh@ethara.ai" },
+    { name = "rahul.yadav@ethara.ai" },
+    { name = "vinit.vani@ethara.ai" },
+    { name = "saurav.kumar@ethara.ai" },
+    { name = "deepanshu.agrawal40@ethara.ai" },
+]
+tags = [
+  "crossrepo",
+  "go",
+  "source-level",
+  "tikv",
+  "kvproto",
+  "read-across-edit-one",
+]
+supported_platforms = [
+  "linux/amd64",
+  "linux/arm64",
+]
+difficulty = "easy"
+
+[metadata.provenance]
+target_repo = "tikv/pd"
+external_repo = "pingcap/kvproto"
+base_commit = "4ae1408fef038e2c41526556d83c9b7c0e98e021"
+pr_url = "https://github.com/tikv/pd/pull/10911"
+
+[[repos]]
+name = "kvproto"
+url = "https://github.com/pingcap/kvproto.git"
+commit = "b41e86365ce0e0fba482005c0dfa5e2ca967d74c"
+path = "/workspace/kvproto"
+editable_install = false
+install_order = 0
+sanitize_history = true
+
+[[repos]]
+name = "pd"
+url = "https://github.com/tikv/pd.git"
+commit = "4ae1408fef038e2c41526556d83c9b7c0e98e021"
+path = "/workspace/pd"
+editable_install = true
+install_order = 1
+sanitize_history = true
+
+[environment]
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+environment_form = "environment/Dockerfile"
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/envora@sha256:9e3b9812c6618663cababad26f2f839a6bfaf9ac9862939b3a1c86e9c1ff21d7"
+resolved_image_digest = "sha256:9e3b9812c6618663cababad26f2f839a6bfaf9ac9862939b3a1c86e9c1ff21d7"
+network_mode = "public"
+build_timeout_sec = 3600.0
+
+[agent]
+timeout_sec = 10800.0
+turn_budget = 600
+max_turns = 600
+network_mode = "allowlist"
+allowed_hosts = [ "192.168.64.1",]
+
+[verifier]
+timeout_sec = 2700.0
+environment_mode = "separate"
+# Network only for the judge API (provider from the config.json "judge" pin); the Go
+# toolchain is offline. A gateway host set via *_BASE_URL must be listed in both allowlists.
+network_mode = "allowlist"
+allowed_hosts = [ "api.anthropic.com", "api.openai.com",]
+
+[[verifier.collect]]
+command = "tar -C / -czf /tmp/agent_workspace.tgz workspace"
+service = "main"
+timeout_sec = 600.0
+
+[[artifacts]]
+source = "/tmp/agent_workspace.tgz"
+destination = "agent_workspace.tgz"
+
+# Agent trajectory, optional evidence for the judge and process record (absent for the oracle).
+[[artifacts]]
+source = "/logs/agent/trajectory.json"
+destination = "trajectory.json"
+
+[verifier.environment]
+# Prebuilt multi-arch verifier image; pin by @sha256 index digest after the push
+# (aws ecr describe-images --repository-name envora --image-ids imageTag=954943fb-3f55-54c4-8f36-1d72defcce86-verifier).
+# tests/ is baked in: any change there means rebuild, push, re-pin.
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/envora@sha256:3a890623b74849c38c554dd1343cb39991daa6760a40fca4236e1f9fdb298086"
+resolved_image_digest = "sha256:3a890623b74849c38c554dd1343cb39991daa6760a40fca4236e1f9fdb298086"
+# Must match [verifier] above.
+network_mode = "allowlist"
+allowed_hosts = [ "api.anthropic.com", "api.openai.com",]
+build_timeout_sec = 3600.0
+os = "linux"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+
+# Verifier env, resolved from the host environment at run time. Credentials/endpoint per
+# provider; JUDGE_* are optional overrides of the config.json pin (empty = use the pin);
+# any override is recorded in process.json judge.pin_overrides.
+[verifier.env]
+ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY:-}"
+ANTHROPIC_BASE_URL = "${ANTHROPIC_BASE_URL:-}"
+OPENAI_API_KEY = "${OPENAI_API_KEY:-}"
+OPENAI_BASE_URL = "${OPENAI_BASE_URL:-}"
+JUDGE_SAMPLES = "${JUDGE_SAMPLES:-}"
+JUDGE_PROVIDER = "${JUDGE_PROVIDER:-}"
+JUDGE_MODEL = "${JUDGE_MODEL:-}"
+JUDGE_EFFORT = "${JUDGE_EFFORT:-}"
+JUDGE_MAX_TOKENS = "${JUDGE_MAX_TOKENS:-}"
+JUDGE_COUNCIL = "${JUDGE_COUNCIL:-}"
+JUDGE_TIMEOUT_SEC = "${JUDGE_TIMEOUT_SEC:-}"
+JUDGE_OPENAI_MAX_TOKENS_FIELD = "${JUDGE_OPENAI_MAX_TOKENS_FIELD:-}"
+
+[verifier.site_runtime]
+version = "3.1.0"
+capabilities = []
+
+[verifier.f2p_p2p]
+per_repo = true
+
+[[verifier.f2p_p2p.repo_tests]]
+repo = "pd"
+test_patch = "tests/test.patch"
+f2p_tests = [
+  "client/keyspace_client_test.go::TestLoadKeyspaceByID",
+  "client/keyspace_client_test.go::TestLoadKeyspaceByIDReturnsHeaderError",
+  "client/keyspace_client_test.go::TestLoadKeyspaceByIDReturnsProtoClientError",
+  "client/keyspace_client_test.go::TestLoadKeyspaceByIDReturnsRPCError",
+]
+p2p_tests = [
+  "client/client_test.go::TestTSLessEqual",
+  "client/client_test.go::TestIsRetryableGetTSError",
+  "client/client_test.go::TestRoundUpDurationToSeconds",
+  "client/client_test.go::TestSaturatingStdDurationFromSeconds",
+  "client/client_test.go::TestIsKeyspaceUsingKeyspaceLevelGC",
+]

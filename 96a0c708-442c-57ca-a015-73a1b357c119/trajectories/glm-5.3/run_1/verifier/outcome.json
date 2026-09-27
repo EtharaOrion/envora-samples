@@ -1,0 +1,44 @@
+{
+  "reward_authority": "outcome",
+  "outcome": 0.0,
+  "resolved": false,
+  "all_f2p_green": false,
+  "all_p2p_green": true,
+  "reference_ok": false,
+  "constraints": 0.0,
+  "aggregate_deterministic": 0.0,
+  "reward": 0.0,
+  "test_patch_apply_path": "git-apply",
+  "tamper": 1,
+  "tamper_reasons": [
+    "graded test file modified by agent (stripped before grading)"
+  ],
+  "stripped_paths": [
+    "graded_test_file\ttestdata/TestClearMsg/bg_fg_cur_color.golden",
+    "graded_test_file\ttestdata/TestClearMsg/clear_screen.golden",
+    "graded_test_file\ttestdata/TestClearMsg/read_set_clipboard.golden",
+    "graded_test_file\ttestdata/TestViewModel/altscreen.golden",
+    "graded_test_file\ttestdata/TestViewModel/altscreen_autoexit.golden",
+    "graded_test_file\ttestdata/TestViewModel/bg_set_color.golden",
+    "graded_test_file\ttestdata/TestViewModel/bp_stop_start.golden",
+    "graded_test_file\ttestdata/TestViewModel/cursor_hide.golden",
+    "graded_test_file\ttestdata/TestViewModel/cursor_hideshow.golden",
+    "graded_test_file\ttestdata/TestViewModel/kitty_stop_startreleases.golden",
+    "graded_test_file\ttestdata/TestViewModel/mouse_allmotion.golden",
+    "graded_test_file\ttestdata/TestViewModel/mouse_cellmotion.golden",
+    "graded_test_file\ttestdata/TestViewModel/mouse_disable.golden"
+  ],
+  "f2p_declared": 2,
+  "f2p_ran": 2,
+  "f2p_passed": 0,
+  "p2p_declared": 2,
+  "p2p_ran": 2,
+  "p2p_passed": 2,
+  "unmatched_declared": 0,
+  "tests": {
+    "screen_test.go::TestViewModel": "failed",
+    "screen_test.go::TestClearMsg": "failed",
+    "tea_test.go::TestTeaModel": "passed",
+    "commands_test.go::TestBatch": "passed"
+  }
+}

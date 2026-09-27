@@ -1,0 +1,26 @@
+{
+    "task": {
+        "path": "/tmp/harbor_task.d90f6z9b/954943fb-3f55-54c4-8f36-1d72defcce86"
+    },
+    "trial_name": "954943fb-3f55-54c4-8f36-1d72defc__nG2wr4s",
+    "trials_dir": "/home/ec2-user/jaskaran-pass8/output/2026-09-24__09-21-51",
+    "agent_timeout_multiplier": 3.0,
+    "environment_build_timeout_multiplier": 4.0,
+    "agent": {
+        "name": "crossrepo_harness.adapters.prebaked_openhands:PrebakedOpenHands",
+        "model_name": "anthropic/claude-opus-5",
+        "env": {
+            "LLM_BASE_URL": "http://10.99.3.1:8767",
+            "LLM_API_KEY": "kaij****tub",
+            "LLM_DROP_PARAMS": "true"
+        }
+    },
+    "environment": {
+        "type": "docker",
+        "delete": false,
+        "extra_docker_compose": [
+            "/home/ec2-user/jaskaran-pass8/seal.yaml"
+        ]
+    },
+    "job_id": "2ae8ba0c-9327-4735-88aa-f3770f5c83c6"
+}

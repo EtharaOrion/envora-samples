@@ -1,0 +1,26 @@
+{
+    "task": {
+        "path": "/tmp/harbor_task.u5dky61r/366c001e-3d60-58ba-a985-96418f6e2289"
+    },
+    "trial_name": "366c001e-3d60-58ba-a985-96418f6e__r4fsAWh",
+    "trials_dir": "/home/ec2-user/Rahul_working/envora-harness-1/runs/pool-a154-glm-a2-172105/output/2026-09-25__17-21-06",
+    "agent_timeout_multiplier": 3.0,
+    "environment_build_timeout_multiplier": 4.0,
+    "agent": {
+        "name": "crossrepo_harness.adapters.prebaked_openhands:PrebakedOpenHands",
+        "model_name": "anthropic/glm-5.3",
+        "extra_allowed_hosts": [
+            "glm-bridge-internal"
+        ],
+        "env": {
+            "LLM_BASE_URL": "http://glm-bridge-internal:8766",
+            "LLM_API_KEY": "envo****tub",
+            "LLM_DROP_PARAMS": "true"
+        }
+    },
+    "environment": {
+        "type": "docker",
+        "delete": false
+    },
+    "job_id": "8d581872-95d6-4bfd-afec-f09405886f34"
+}

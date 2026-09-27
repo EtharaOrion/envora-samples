@@ -1,0 +1,29 @@
+{
+    "task": {
+        "path": "366c001e-3d60-58ba-a985-96418f6e2289"
+    },
+    "trial_name": "366c001e-3d60-58ba-a985-96418f6e__AKcFSjd",
+    "trials_dir": "/home/ec2-user/Rahul_working/sealed-run/jobs/a15-merged-v2",
+    "agent_timeout_multiplier": 3.0,
+    "agent_setup_timeout_multiplier": 5.0,
+    "agent": {
+        "name": "crossrepo_harness.adapters.prebaked_openhands:PrebakedOpenHands",
+        "model_name": "anthropic/claude-opus-5",
+        "kwargs": {
+            "api_base": "http://10.99.2.1:8768",
+            "version": "1.6.0",
+            "max_iterations": 350
+        },
+        "env": {
+            "LLM_API_KEY": "harb****ret",
+            "LLM_DROP_PARAMS": "true"
+        }
+    },
+    "environment": {
+        "type": "docker",
+        "extra_docker_compose": [
+            "ec2-sealed-a15.yaml"
+        ]
+    },
+    "job_id": "000258ce-cd3b-4eb5-a1c3-bbac07af1b65"
+}

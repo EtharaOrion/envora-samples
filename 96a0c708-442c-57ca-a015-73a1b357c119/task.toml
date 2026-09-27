@@ -1,0 +1,148 @@
+schema_version = "1.4"
+
+[task]
+name = "ethara/envora-bubbletea-synchronized-output"
+project_id = "Envora-001"
+version = "1.0.0"
+
+[metadata]
+uuid = "96a0c708-442c-57ca-a015-73a1b357c119"
+authors = [
+    { name = "suryansh@ethara.ai" },
+    { name = "sarvex@ethara.ai" },
+    { name = "gurpreet.singh2037@ethara.ai" },
+    { name = "navya.arora@ethara.ai" },
+    { name = "supriya.verma@ethara.ai" },
+    { name = "kanishk.singh@ethara.ai" },
+    { name = "rahul.yadav@ethara.ai" },
+    { name = "vinit.vani@ethara.ai" },
+    { name = "yogendra@ethara.ai" },
+    { name = "jasskaran@ethara.ai" },
+]
+tags = [
+  "crossrepo",
+  "go",
+  "source-level",
+  "bubbletea",
+  "ultraviolet",
+  "read-across-edit-one",
+]
+supported_platforms = [
+  "linux/amd64",
+  "linux/arm64",
+]
+difficulty = "expert"
+
+[metadata.provenance]
+target_repo = "charmbracelet/bubbletea"
+external_repo = "charmbracelet/ultraviolet"
+base_commit = "8f17c3584f3df68f12703cb0f5e58f482f2e5d62"
+pr_url = "https://github.com/charmbracelet/bubbletea/pull/1542"
+
+[[repos]]
+name = "ultraviolet"
+url = "https://github.com/charmbracelet/ultraviolet.git"
+commit = "9deacb990ee730bd234d9229d8b823b5b372b39f"
+path = "/workspace/ultraviolet"
+editable_install = false
+install_order = 0
+sanitize_history = true
+
+[[repos]]
+name = "bubbletea"
+url = "https://github.com/charmbracelet/bubbletea.git"
+commit = "8f17c3584f3df68f12703cb0f5e58f482f2e5d62"
+path = "/workspace/bubbletea"
+editable_install = true
+install_order = 1
+sanitize_history = true
+
+[environment]
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+environment_form = "environment/Dockerfile"
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/envora@sha256:128352b7143852528bd64937699129c010a085a547fa5cd8bf074350ca65ce3a"
+resolved_image_digest = "sha256:128352b7143852528bd64937699129c010a085a547fa5cd8bf074350ca65ce3a"
+network_mode = "public"
+build_timeout_sec = 3600.0
+
+[agent]
+timeout_sec = 10800.0
+turn_budget = 600
+max_turns = 600
+network_mode = "allowlist"
+allowed_hosts = [ "192.168.64.1",]
+
+[verifier]
+timeout_sec = 2700.0
+environment_mode = "separate"
+# Network only for the judge API (provider from the config.json "judge" pin); the Go
+# toolchain is offline. A gateway host set via *_BASE_URL must be listed in both allowlists.
+network_mode = "allowlist"
+allowed_hosts = [ "api.anthropic.com", "api.openai.com",]
+
+[[verifier.collect]]
+command = "tar -C / -czf /tmp/agent_workspace.tgz workspace"
+service = "main"
+timeout_sec = 600.0
+
+[[artifacts]]
+source = "/tmp/agent_workspace.tgz"
+destination = "agent_workspace.tgz"
+
+# Agent trajectory, optional evidence for the judge and process record (absent for the oracle).
+[[artifacts]]
+source = "/logs/agent/trajectory.json"
+destination = "trajectory.json"
+
+[verifier.environment]
+# Prebuilt multi-arch verifier image; pin by @sha256 index digest after the push
+# (aws ecr describe-images --repository-name envora --image-ids imageTag=96a0c708-442c-57ca-a015-73a1b357c119-verifier).
+# tests/ is baked in: any change there means rebuild, push, re-pin.
+docker_image = "426628337772.dkr.ecr.ap-south-1.amazonaws.com/envora@sha256:dd79c23c754e419c436c0d788f5117b85b5f1f8840b8058e2ca6b56714d2fe5c"
+resolved_image_digest = "sha256:dd79c23c754e419c436c0d788f5117b85b5f1f8840b8058e2ca6b56714d2fe5c"
+# Must match [verifier] above.
+network_mode = "allowlist"
+allowed_hosts = [ "api.anthropic.com", "api.openai.com",]
+build_timeout_sec = 3600.0
+os = "linux"
+cpus = 4
+memory_mb = 8192
+storage_mb = 20480
+
+# Verifier env, resolved from the host environment at run time. Credentials/endpoint per
+# provider; JUDGE_* are optional overrides of the config.json pin (empty = use the pin);
+# any override is recorded in process.json judge.pin_overrides.
+[verifier.env]
+ANTHROPIC_API_KEY = "${ANTHROPIC_API_KEY:-}"
+ANTHROPIC_BASE_URL = "${ANTHROPIC_BASE_URL:-}"
+OPENAI_API_KEY = "${OPENAI_API_KEY:-}"
+OPENAI_BASE_URL = "${OPENAI_BASE_URL:-}"
+JUDGE_SAMPLES = "${JUDGE_SAMPLES:-}"
+JUDGE_PROVIDER = "${JUDGE_PROVIDER:-}"
+JUDGE_MODEL = "${JUDGE_MODEL:-}"
+JUDGE_EFFORT = "${JUDGE_EFFORT:-}"
+JUDGE_MAX_TOKENS = "${JUDGE_MAX_TOKENS:-}"
+JUDGE_COUNCIL = "${JUDGE_COUNCIL:-}"
+JUDGE_TIMEOUT_SEC = "${JUDGE_TIMEOUT_SEC:-}"
+JUDGE_OPENAI_MAX_TOKENS_FIELD = "${JUDGE_OPENAI_MAX_TOKENS_FIELD:-}"
+
+[verifier.site_runtime]
+version = "3.1.0"
+capabilities = []
+
+[verifier.f2p_p2p]
+per_repo = true
+
+[[verifier.f2p_p2p.repo_tests]]
+repo = "bubbletea"
+test_patch = "tests/test.patch"
+f2p_tests = [
+  "screen_test.go::TestViewModel",
+  "screen_test.go::TestClearMsg",
+]
+p2p_tests = [
+  "tea_test.go::TestTeaModel",
+  "commands_test.go::TestBatch",
+]

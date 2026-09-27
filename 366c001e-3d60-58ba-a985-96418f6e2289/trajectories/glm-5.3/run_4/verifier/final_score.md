@@ -1,0 +1,10 @@
+| metric | value |
+| --- | --- |
+| det | 0.9444 |
+| rubric | 0.9035 |
+| process | 0.9240 |
+| outcome | 0.3333 |
+| gate | 1 |
+| alpha | 0.050000 |
+| score_eval | 0.3924 |
+| score_rl | 0.3500 |

@@ -1,0 +1,22 @@
+{
+    "task": {
+        "path": "/home/ec2-user/pass8-opus5/task/366c001e-3d60-58ba-a985-96418f6e2289"
+    },
+    "trial_name": "366c001e-3d60-58ba-a985-96418f6e__bcXXRZ2",
+    "trials_dir": "/home/ec2-user/pass8-opus5/regrade",
+    "agent": {
+        "name": "crossrepo_harness.adapters.prebaked_openhands:PrebakedOpenHands",
+        "model_name": "anthropic/claude-opus-5",
+        "env": {
+            "LLM_BASE_URL": "http://10.99.2.1:8765",
+            "LLM_API_KEY": "kaij****tub",
+            "LLM_DROP_PARAMS": "true"
+        }
+    },
+    "source_trial": {
+        "action": "regrade",
+        "type": "local",
+        "trial_id": "891558c0-e39c-4f86-9927-c5d3940fe7b0",
+        "path": "/home/ec2-user/pass8-opus5/slots/2/jobs/2026-09-24__12-27-49/366c001e-3d60-58ba-a985-96418f6e__5DN37eF"
+    }
+}

@@ -1,0 +1,137 @@
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/context/context.go ./pkg/distsql/context/context.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/context/context.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/distsql/context/context.go	2026-09-25 17:29:58.000000000 +0000
+@@ -74,6 +74,7 @@
+ 	EnablePaging                  bool
+ 	MinPagingSize                 int
+ 	MaxPagingSize                 int
++	PagingSizeBytes               uint64
+ 	RequestSourceType             string
+ 	ExplicitRequestSourceType     string
+ 	StoreBatchSize                int
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/context/context_test.go ./pkg/distsql/context/context_test.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/context/context_test.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/distsql/context/context_test.go	2026-09-25 17:45:13.000000000 +0000
+@@ -82,6 +82,7 @@
+ 		EnablePaging:                  true,
+ 		MinPagingSize:                 1,
+ 		MaxPagingSize:                 1,
++		PagingSizeBytes:               1,
+ 		RequestSourceType:             "a",
+ 		ExplicitRequestSourceType:     "b",
+ 		StoreBatchSize:                1,
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/request_builder.go ./pkg/distsql/request_builder.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/request_builder.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/distsql/request_builder.go	2026-09-25 17:29:58.000000000 +0000
+@@ -363,6 +363,7 @@
+ 		builder.SetPaging(dctx.EnablePaging)
+ 		builder.Request.Paging.MinPagingSize = uint64(dctx.MinPagingSize)
+ 		builder.Request.Paging.MaxPagingSize = uint64(dctx.MaxPagingSize)
++		builder.Request.Paging.PagingSizeBytes = dctx.PagingSizeBytes
+ 	}
+ 	builder.RequestSource.RequestSourceInternal = dctx.InRestrictedSQL
+ 	builder.RequestSource.RequestSourceType = dctx.RequestSourceType
+diff -ruN /opt/pristine/workspace/tidb/pkg/kv/kv.go ./pkg/kv/kv.go
+--- /opt/pristine/workspace/tidb/pkg/kv/kv.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/kv/kv.go	2026-09-25 17:29:54.000000000 +0000
+@@ -637,6 +637,12 @@
+ 		// when enabled, this field is adjusted to be max(MaxPagingSize, paging.MinAllowedMaxPagingSize),
+ 		// see paging.GrowPagingSize
+ 		MaxPagingSize uint64
++		// PagingSizeBytes is the byte-sized paging budget, 0 when disabled, otherwise it
++		// should be a positive number. When set, it caps the encoded size of a single page
++		// in addition to the row-count-based paging size, so that resource control can
++		// pre-charge RU at byte granularity. Unlike MinPagingSize/MaxPagingSize, it is a
++		// fixed per-page budget that doesn't grow between pages.
++		PagingSizeBytes uint64
+ 	}
+ 	// RequestSource indicates whether the request is an internal request.
+ 	RequestSource util.RequestSource
+diff -ruN /opt/pristine/workspace/tidb/pkg/session/session.go ./pkg/session/session.go
+--- /opt/pristine/workspace/tidb/pkg/session/session.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/session/session.go	2026-09-25 18:00:57.000000000 +0000
+@@ -3507,6 +3507,7 @@
+ 			EnablePaging:                  vars.EnablePaging,
+ 			MinPagingSize:                 vars.MinPagingSize,
+ 			MaxPagingSize:                 vars.MaxPagingSize,
++			PagingSizeBytes:               vars.PagingSizeBytes,
+ 			RequestSourceType:             vars.RequestSourceType,
+ 			ExplicitRequestSourceType:     vars.ExplicitRequestSourceType,
+ 			StoreBatchSize:                vars.StoreBatchSize,
+diff -ruN /opt/pristine/workspace/tidb/pkg/sessionctx/vardef/sysvar.go ./pkg/sessionctx/vardef/sysvar.go
+--- /opt/pristine/workspace/tidb/pkg/sessionctx/vardef/sysvar.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/sessionctx/vardef/sysvar.go	2026-09-25 18:00:57.000000000 +0000
+@@ -310,6 +310,8 @@
+ 	MaxExecutionTime = "max_execution_time"
+ 	// TiDBMaxKeysRead is the name of the 'tidb_max_keys_read' system variable.
+ 	TiDBMaxKeysRead = "tidb_max_keys_read"
++	// TiDBPagingSizeBytes is the name of the 'tidb_paging_size_bytes' system variable.
++	TiDBPagingSizeBytes = "tidb_paging_size_bytes"
+ 	// TiKVClientReadTimeout is the name of the 'tikv_client_read_timeout' system variable.
+ 	TiKVClientReadTimeout = "tikv_client_read_timeout"
+ 	// TiDBLoadBindingTimeout is the name of the 'tidb_load_binding_timeout' system variable.
+diff -ruN /opt/pristine/workspace/tidb/pkg/sessionctx/variable/session.go ./pkg/sessionctx/variable/session.go
+--- /opt/pristine/workspace/tidb/pkg/sessionctx/variable/session.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/sessionctx/variable/session.go	2026-09-25 18:00:57.000000000 +0000
+@@ -1311,6 +1311,11 @@
+ 	// may examine. 0 means unlimited. Only applies to SELECT statements.
+ 	MaxKeysRead uint64
+ 
++	// PagingSizeBytes is the byte-sized paging budget sent with coprocessor paging
++	// requests. 0 means disabled, i.e. paging is only bounded by the row-count-based
++	// paging size.
++	PagingSizeBytes uint64
++
+ 	// KeysExamined is the cumulative number of storage engine keys examined across all
+ 	// statements (SELECT, UPDATE, DELETE, etc.) in this session. Reset by FLUSH STATUS.
+ 	KeysExamined uint64
+diff -ruN /opt/pristine/workspace/tidb/pkg/sessionctx/variable/sysvar.go ./pkg/sessionctx/variable/sysvar.go
+--- /opt/pristine/workspace/tidb/pkg/sessionctx/variable/sysvar.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/sessionctx/variable/sysvar.go	2026-09-25 18:00:57.000000000 +0000
+@@ -1965,6 +1965,18 @@
+ 		}},
+ 	{
+ 		Scope:                   vardef.ScopeGlobal | vardef.ScopeSession,
++		Name:                    vardef.TiDBPagingSizeBytes,
++		Value:                   "0",
++		Type:                    vardef.TypeUnsigned,
++		MinValue:                0,
++		MaxValue:                math.MaxUint64,
++		IsHintUpdatableVerified: true,
++		SetSession: func(s *SessionVars, val string) error {
++			s.PagingSizeBytes = TidbOptUint64(val, 0)
++			return nil
++		}},
++	{
++		Scope:                   vardef.ScopeGlobal | vardef.ScopeSession,
+ 		Name:                    vardef.TiKVClientReadTimeout,
+ 		Value:                   "0",
+ 		Type:                    vardef.TypeUnsigned,
+diff -ruN /opt/pristine/workspace/tidb/pkg/store/copr/copr_test/coprocessor_test.go ./pkg/store/copr/copr_test/coprocessor_test.go
+--- /opt/pristine/workspace/tidb/pkg/store/copr/copr_test/coprocessor_test.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/store/copr/copr_test/coprocessor_test.go	2026-09-25 17:41:55.000000000 +0000
+@@ -242,9 +242,10 @@
+ 		Concurrency:    15,
+ 		StoreBatchSize: 3,
+ 		Paging: struct {
+-			Enable        bool
+-			MinPagingSize uint64
+-			MaxPagingSize uint64
++			Enable          bool
++			MinPagingSize   uint64
++			MaxPagingSize   uint64
++			PagingSizeBytes uint64
+ 		}{
+ 			Enable:        true,
+ 			MinPagingSize: 1,
+diff -ruN /opt/pristine/workspace/tidb/pkg/store/copr/coprocessor.go ./pkg/store/copr/coprocessor.go
+--- /opt/pristine/workspace/tidb/pkg/store/copr/coprocessor.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/store/copr/coprocessor.go	2026-09-25 17:30:06.000000000 +0000
+@@ -1727,6 +1727,7 @@
+ 		Ranges:          task.ranges.ToPBRanges(),
+ 		SchemaVer:       worker.req.SchemaVar,
+ 		PagingSize:      task.pagingSize,
++		PagingSizeBytes: worker.req.Paging.PagingSizeBytes,
+ 		MaxKeysRead:     taskMaxKeysRead,
+ 		Tasks:           task.ToPBBatchTasks(),
+ 		ConnectionId:    worker.req.ConnID,

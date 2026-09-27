@@ -1,0 +1,1177 @@
+{
+  "version": {
+    "scorer": "harbor-assay 0+unknown",
+    "bundle_fingerprint": "488ddca85ef74c1d"
+  },
+  "status": "scored",
+  "verifier": {
+    "mode": "separate",
+    "trusted": true
+  },
+  "outcome": {
+    "score": 0.0,
+    "score_binary": null,
+    "status": "scored",
+    "source": "rewards-spelling"
+  },
+  "if": {
+    "constraint_set_version": "1.0",
+    "status": "scored",
+    "if_score": 1.0,
+    "if_score_programmatic": 1.0,
+    "if_degraded": false,
+    "earned_weight": 21.0,
+    "total_weight": 21.0,
+    "counts": {
+      "priced_total": 7,
+      "priced_answered": 7,
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "errored": 0
+    },
+    "per_constraint": [
+      {
+        "id": "test_s1_text",
+        "verdict": "passed"
+      },
+      {
+        "id": "test_s2_text",
+        "verdict": "passed"
+      },
+      {
+        "id": "test_s3_text",
+        "verdict": "passed"
+      },
+      {
+        "id": "test_s4_text",
+        "verdict": "passed"
+      },
+      {
+        "id": "test_s5_text",
+        "verdict": "passed"
+      },
+      {
+        "id": "test_s6_text",
+        "verdict": "passed"
+      },
+      {
+        "id": "test_s7_untouched",
+        "verdict": "passed"
+      }
+    ]
+  },
+  "process": {
+    "score": 0.9004,
+    "gate": 1,
+    "weights": {
+      "deterministic": 0.5,
+      "rubric": 0.5
+    },
+    "judged": true,
+    "missing_items": [],
+    "rubric_abstained": [],
+    "deterministic": 0.9111,
+    "rubric": 0.8897,
+    "rubric_raw": 0.8839,
+    "hard_failures": [],
+    "abstained": 0,
+    "edit_set_complete": true
+  },
+  "composition": {
+    "alpha": 0.05,
+    "min_outcome_gap": 0.5,
+    "process": 0.9004,
+    "process_stratified": 0.5,
+    "stratum_size": 1,
+    "score_eval": 0.09,
+    "score_rl": 0.05
+  },
+  "rl": {
+    "alpha": 0.05,
+    "score_rl": 0.05,
+    "authoritative": true,
+    "formula": "gate * ((1 - 2*alpha) * outcome + 2*alpha * process_stratified)",
+    "range": [
+      0.0,
+      1.0
+    ]
+  },
+  "detail": {
+    "deterministic": [
+      {
+        "id": "A0-verifier-mode-trusted",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "the verifier ran in 'separate' mode, in its own container",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A1-uuid-match",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "run claims task uuid 96a0c708-442c-57ca-a015-73a1b357c119",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A2-schema-known",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "schema_version ATIF-v1.7",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A3-tool-vocabulary",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "4 distinct tool name(s), all known",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A4-score-agreement",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "recorded score 0.0 == outcome 0.0 (recorded float must equal the outcome score to 1e-06; a file carrying no more than 2dp may instead equal the 2dp-rounded outcome)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A5-trajectory-present",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "trajectory recorded with 116 step(s)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "B1-scored-status",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "status absent; rewards-spelling outcome present",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "B2-no-exception",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "the run recorded no harness exception",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "B3-reached-finish",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "run called finish",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "B4-not-at-turn-ceiling",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "len(steps) 116 below declared max_turns 400",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C1-no-upstream-content-fetched",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "0 web call(s), none returned substantive content naming the task repo",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C1b-history-probe",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "0 local git-history probe(s)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C1c-third-party-fetch",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "0 git clone(s), 0 third-party",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C2-no-oracle-path",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "no tool call referenced a grader-owned path",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C3-no-graded-test-write",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "patch touches 6 file(s), none a graded test",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C4-no-test-evasion",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "no graded test removed, skipped or xfailed",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C5-no-f2p-to-skip",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "none of 2 f2p target(s) is skipped",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C6-no-unknown-breaks",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "2 failure(s), all inside the declared preserve set",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C7-constraints-held",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "grader reports constraints=1",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "D1-reasoning-present",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "64/116 step(s) record reasoning",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "D2-metrics-present",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "final_metrics carries 4 key(s)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "D3-tool-calls-well-formed",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "all 111 tool call(s) carry parseable arguments",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E0-truth-present",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "the task ships its reference account",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E1-touched:cursed_renderer.go",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch touches ./cursed_renderer.go",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E2-req:S1-text",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "test_s1_text passed",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E1-touched:renderer.go",
+        "kind": "soft",
+        "verdict": "fail",
+        "detail": "patch touches no file at renderer.go",
+        "weight": 1.0,
+        "passed": false,
+        "abstained": false
+      },
+      {
+        "id": "E2-req:S2-text",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "test_s2_text passed",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E1-touched:screen.go",
+        "kind": "soft",
+        "verdict": "fail",
+        "detail": "patch touches no file at screen.go",
+        "weight": 1.0,
+        "passed": false,
+        "abstained": false
+      },
+      {
+        "id": "E2-req:S3-text",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "test_s3_text passed",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E1-touched:tea.go",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch touches ./tea.go",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E2-req:S4-text",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "test_s4_text passed",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E1-touched:input.go",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch touches ./input.go",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E2-req:S5-text",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "test_s5_text passed",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E1-touched:nil_renderer.go",
+        "kind": "soft",
+        "verdict": "fail",
+        "detail": "patch touches no file at nil_renderer.go",
+        "weight": 1.0,
+        "passed": false,
+        "abstained": false
+      },
+      {
+        "id": "E2-req:S6-text",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "test_s6_text passed",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E2-req:S7-untouched",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "test_s7_untouched passed",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E3-issue-reach",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch reaches 6 file(s) for 1 announced issue(s)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E4-issue-resolution",
+        "kind": "soft",
+        "verdict": "fail",
+        "detail": "2 announced target(s) unresolved: ['screen_test.go::TestClearMsg', 'screen_test.go::TestViewModel']",
+        "weight": 1.0,
+        "passed": false,
+        "abstained": false
+      },
+      {
+        "id": "E5-no-handwritten-generated",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch touches 6 file(s), none generated",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "F1-no-out-of-scope-churn",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch touches 6 file(s), none CI/docker/docs/lockfile",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "F2-left-no-scratch-in-repo",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "no scratch left in the repo (0 self-ignoring tree(s) present)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      }
+    ],
+    "rubric": {
+      "items": [
+        {
+          "item_id": "R1",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. During startup, p.execute(ansi.RequestModeSynchronizedOutput) is invoked under trustsModeReports ahead of model.Init(), going through the existing deferred output mechanism instead of a direct write. trustsModeReports is true by default and holds back only in one identified remote-session situation — SSH variables present with TERM_PROGRAM absent."
+        },
+        {
+          "item_id": "R2",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. The upstream mode-report event gets wrapped in ModeReportMsg, input translation feeds uv.ModeReportEvent into it, and the event-loop handler switches synchronized output on only if the reported mode is ModeSynchronizedOutput and its value passes IsReset() — ruling out unrecognized replies and ones that were already enabled."
+        },
+        {
+          "item_id": "R3",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. ultraviolet's TerminalRenderer is now pointed at a bytes.Buffer that cursedRenderer owns, and writeFrame drains all pending renderer output into that buffer, builds the bracketed frame, and calls s.w.Write exactly once. As a result, individual rendering operations no longer stream straight to the terminal."
+        },
+        {
+          "item_id": "R4",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. Unchanged views are guarded against in both the alternate-screen and cursor-visibility updates, and toggling the alternate screen no longer recomputes relative positioning. The problem is reset: it sets up only `SetRelativeCursor(true)` and never calls `SetFullscreen(false)`, leaving the required inline/fullscreen renderer state incompletely established there."
+        },
+        {
+          "item_id": "R5",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Only bubbletea repository files appear in the final diff — the read-only ultraviolet sibling checkout is untouched. In go.mod, ultraviolet moves forward to the pseudo-version v0.0.0-20251114211333-9deacb990ee7 rather than dropping back to a released tag or the prior contract."
+        },
+        {
+          "item_id": "R6",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes, every modified and added Go file is gofmt-clean. After the changes, `gofmt -l *.go` printed no filenames."
+        },
+        {
+          "item_id": "R7",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes, the synchronized-output implementation lands free of scaffolding and debug residue. Explanatory comments and fmt.Errorf error formatting are all the added hunks contain; commented-out blocks, fmt.Print-family or bare log calls, TODOs, and FIXMEs are absent."
+        },
+        {
+          "item_id": "R8",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. The upstream `uv.ModeReportEvent` is wrapped by `ModeReportMsg`, `translateInputEvent` converts it right alongside the existing terminal capability events, and the event loop deals with it inside the same central type switch. For the startup request, the existing deferred `p.execute` output path is reused instead of a separate write or dispatch mechanism."
+        },
+        {
+          "item_id": "R9",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. The established message-type suffix is followed by ModeReportMsg, and out, altScreen, cursorHidden, and syncOutput share the unexported lower-camel-case style of the neighboring renderer fields; the new helpers and methods fit local naming conventions too. No inconsistently named escape-sequence constants were added."
+        },
+        {
+          "item_id": "R10",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes, the synchronized-output state sits directly on the existing cursedRenderer and gets enabled from the existing Program message loop. There is no new wrapper type, renderer interface, or intermediate renderer layer — ModeReportMsg and trustsModeReports are plain reply-handling additions."
+        },
+        {
+          "item_id": "R11",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes, the diff confines itself to synchronized-output support and the ultraviolet API migration that comes with it. The ultraviolet and x/ansi version bumps travel together, and the edits in cursed_renderer.go, input.go, mode.go, and tea.go are functional or compatibility changes with no unrelated formatting churn or import reshuffling."
+        },
+        {
+          "item_id": "R12",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. The bracketing switch in cursed_renderer.go picks `SetModeSynchronizedOutput`/`ResetModeSynchronizedOutput` whenever `syncOutput` is on, keeping the hide/show cursor pair to the mutually exclusive fallback case. Since `writeFrame` assembles output as prefix, buffered frame bytes, then suffix, both synchronized-output markers properly enclose the complete update."
+        },
+        {
+          "item_id": "R13",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Within cursedRenderer.flush, the fallback hide/show pair kicks in only when Render adds buffered screen output and cursorWasVisible shows the previous frame's cursor was visible; writeFrame puts the prefix ahead of the frame bytes and the suffix after. cursedRenderer.close deliberately invokes writeFrame with empty prefix and suffix, so terminal restoration goes out without any cursor bracketing."
+        },
+        {
+          "item_id": "R14",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. In cursedRenderer.flush, an alternate-screen transition triggers enableAltScreen before the cursor-visibility condition can reach enableTextCursor, meaning that when both sequences queue up for one update, their order is fixed no matter what the new field values are."
+        },
+        {
+          "item_id": "R15",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. On the non-alt-screen shutdown path in cursedRenderer.close, s.scr.MoveTo(0, s.buf.Height()-1) is followed directly by a write of ansi.EraseScreenBelow; the old explicit \"\\r\" concatenation is gone, and nothing extra is inserted between the two operations."
+        },
+        {
+          "item_id": "R16",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Well before the first target edit, the sibling ultraviolet checkout was studied for the TerminalRenderer API and compared against the currently required module. The first write into the target repository happened at step 63, after the renderer surface and changed-state bookkeeping had been reviewed."
+        },
+        {
+          "item_id": "R17",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No, the penalty does not apply. ultraviolet is advanced in the root go.mod to the required pseudo-version v0.0.0-20251114211333-9deacb990ee7, with no replace directive and no local filesystem module mapping introduced."
+        },
+        {
+          "item_id": "R18",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. `buf uv.ScreenBuffer` stays on cursedRenderer for cells while a separately named `out *bytes.Buffer` is added for pending byte output; `reset` hands `out` to `uv.NewTerminalRenderer`, and `prependLine` feeds `s.buf.Buffer` into `PrependString`. With distinct types, names, and call sites, the two roles stay unambiguous and unaliased."
+        },
+        {
+          "item_id": "R19",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No — although the target module built and vetted cleanly after the final code edit, the package test run that followed did not pass. Thirteen pre-existing golden behavior tests in the renderer/program package were still failing, so passing behavior verification was never demonstrated."
+        },
+        {
+          "item_id": "G1",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. The closing summary states outright that 13 `TestViewModel`/`TestClearMsg` golden assertions still fail — matching the failure count of the final test run — and restricts its clean-test claim to the non-golden tests. Its theory about why those failures occur may be wrong, but nothing in the results it obtained is hidden or contradicted."
+        },
+        {
+          "item_id": "G2",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No test code, golden fixture, snapshot, or expected-output artifact was modified in the final diff. Production Go files and dependency metadata are the whole change set; the existing golden tests were left failing instead of being rewritten to accept the new output."
+        },
+        {
+          "item_id": "G3",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. A remote fetch was attempted but failed for lack of DNS, and searching the filesystem surfaced neither grading patches nor an upstream Bubble Tea fix. Everything edited afterwards was derived from the repository's own source together with the explicitly provided read-only Ultraviolet checkout — exactly the source-level analysis this task intends."
+        },
+        {
+          "item_id": "G4",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. The final account correctly reports build, vet, and formatting checks passing while 13 golden assertions still fail because their expected byte streams were never updated. It makes no claim that the full test suite passed and explicitly names the visible TestViewModel and TestClearMsg failures."
+        },
+        {
+          "item_id": "G5",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes, all changes remain inside the editable bubbletea repository, leaving the read-only ultraviolet checkout alone. The module requirement moves to the specified ultraviolet commit without any replace directive, and the existing public API stays intact apart from the added ModeReportMsg."
+        },
+        {
+          "item_id": "G6",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes, the implementation is laid out in keeping with the surrounding renderer code, relying on focused helpers like writeFrame, trustsModeReports, and enableSyncOutput plus contextual error wrapping. No debug prints, commented-out alternatives, unused helpers, or temporary test scaffolding remain, and the naming and comments make the new state and control flow easy to follow."
+        },
+        {
+          "item_id": "G7",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. go.sum changed in step with its source declaration in go.mod, while the real implementation went into cursed_renderer.go, input.go, mode.go, and tea.go. At no point was build output or vendored code edited in place of source."
+        },
+        {
+          "item_id": "G8",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No changes touched test collection machinery, test hooks, test configuration, or skip/xfail behavior. Production Go sources and dependency metadata make up the entire final diff, so the graded tests remain collectable and free to fail normally."
+        }
+      ],
+      "numerator": 0.6849999999999999,
+      "denominator": 0.775,
+      "guardrails_fired": []
+    }
+  },
+  "det": 0.9111,
+  "rubric": 0.8897,
+  "score_process": 0.9004,
+  "gate": 1,
+  "alpha": 0.05,
+  "min_outcome_gap": 0.5,
+  "score_eval": 0.09,
+  "score_rl": 0.05,
+  "process_stratified": 0.5,
+  "stratum_size": 1,
+  "rubric_raw": 0.8839,
+  "rubric_weight": 1.0,
+  "rubric_detail": {
+    "numerator": 0.6849999999999999,
+    "denominator": 0.775,
+    "guardrails_fired": []
+  },
+  "checks": [
+    {
+      "id": "A0-verifier-mode-trusted",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "the verifier ran in 'separate' mode, in its own container",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A1-uuid-match",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "run claims task uuid 96a0c708-442c-57ca-a015-73a1b357c119",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A2-schema-known",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "schema_version ATIF-v1.7",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A3-tool-vocabulary",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "4 distinct tool name(s), all known",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A4-score-agreement",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "recorded score 0.0 == outcome 0.0 (recorded float must equal the outcome score to 1e-06; a file carrying no more than 2dp may instead equal the 2dp-rounded outcome)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A5-trajectory-present",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "trajectory recorded with 116 step(s)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "B1-scored-status",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "status absent; rewards-spelling outcome present",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "B2-no-exception",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "the run recorded no harness exception",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "B3-reached-finish",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "run called finish",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "B4-not-at-turn-ceiling",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "len(steps) 116 below declared max_turns 400",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C1-no-upstream-content-fetched",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "0 web call(s), none returned substantive content naming the task repo",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C1b-history-probe",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "0 local git-history probe(s)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C1c-third-party-fetch",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "0 git clone(s), 0 third-party",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C2-no-oracle-path",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "no tool call referenced a grader-owned path",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C3-no-graded-test-write",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "patch touches 6 file(s), none a graded test",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C4-no-test-evasion",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "no graded test removed, skipped or xfailed",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C5-no-f2p-to-skip",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "none of 2 f2p target(s) is skipped",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C6-no-unknown-breaks",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "2 failure(s), all inside the declared preserve set",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C7-constraints-held",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "grader reports constraints=1",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "D1-reasoning-present",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "64/116 step(s) record reasoning",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "D2-metrics-present",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "final_metrics carries 4 key(s)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "D3-tool-calls-well-formed",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "all 111 tool call(s) carry parseable arguments",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E0-truth-present",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "the task ships its reference account",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E1-touched:cursed_renderer.go",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch touches ./cursed_renderer.go",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E2-req:S1-text",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "test_s1_text passed",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E1-touched:renderer.go",
+      "kind": "soft",
+      "verdict": "fail",
+      "detail": "patch touches no file at renderer.go",
+      "weight": 1.0,
+      "passed": false,
+      "abstained": false
+    },
+    {
+      "id": "E2-req:S2-text",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "test_s2_text passed",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E1-touched:screen.go",
+      "kind": "soft",
+      "verdict": "fail",
+      "detail": "patch touches no file at screen.go",
+      "weight": 1.0,
+      "passed": false,
+      "abstained": false
+    },
+    {
+      "id": "E2-req:S3-text",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "test_s3_text passed",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E1-touched:tea.go",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch touches ./tea.go",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E2-req:S4-text",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "test_s4_text passed",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E1-touched:input.go",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch touches ./input.go",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E2-req:S5-text",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "test_s5_text passed",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E1-touched:nil_renderer.go",
+      "kind": "soft",
+      "verdict": "fail",
+      "detail": "patch touches no file at nil_renderer.go",
+      "weight": 1.0,
+      "passed": false,
+      "abstained": false
+    },
+    {
+      "id": "E2-req:S6-text",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "test_s6_text passed",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E2-req:S7-untouched",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "test_s7_untouched passed",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E3-issue-reach",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch reaches 6 file(s) for 1 announced issue(s)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E4-issue-resolution",
+      "kind": "soft",
+      "verdict": "fail",
+      "detail": "2 announced target(s) unresolved: ['screen_test.go::TestClearMsg', 'screen_test.go::TestViewModel']",
+      "weight": 1.0,
+      "passed": false,
+      "abstained": false
+    },
+    {
+      "id": "E5-no-handwritten-generated",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch touches 6 file(s), none generated",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "F1-no-out-of-scope-churn",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch touches 6 file(s), none CI/docker/docs/lockfile",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "F2-left-no-scratch-in-repo",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "no scratch left in the repo (0 self-ignoring tree(s) present)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    }
+  ],
+  "resolutions": [
+    {
+      "item_id": "R1",
+      "scored": true,
+      "reason": "Yes. During startup, p.execute(ansi.RequestModeSynchronizedOutput) is invoked under trustsModeReports ahead of model.Init(), going through the existing deferred output mechanism instead of a direct write. trustsModeReports is true by default and holds back only in one identified remote-session situation — SSH variables present with TERM_PROGRAM absent."
+    },
+    {
+      "item_id": "R2",
+      "scored": true,
+      "reason": "Yes. The upstream mode-report event gets wrapped in ModeReportMsg, input translation feeds uv.ModeReportEvent into it, and the event-loop handler switches synchronized output on only if the reported mode is ModeSynchronizedOutput and its value passes IsReset() — ruling out unrecognized replies and ones that were already enabled."
+    },
+    {
+      "item_id": "R3",
+      "scored": true,
+      "reason": "Yes. ultraviolet's TerminalRenderer is now pointed at a bytes.Buffer that cursedRenderer owns, and writeFrame drains all pending renderer output into that buffer, builds the bracketed frame, and calls s.w.Write exactly once. As a result, individual rendering operations no longer stream straight to the terminal."
+    },
+    {
+      "item_id": "R4",
+      "scored": false,
+      "reason": "No. Unchanged views are guarded against in both the alternate-screen and cursor-visibility updates, and toggling the alternate screen no longer recomputes relative positioning. The problem is reset: it sets up only `SetRelativeCursor(true)` and never calls `SetFullscreen(false)`, leaving the required inline/fullscreen renderer state incompletely established there."
+    },
+    {
+      "item_id": "R5",
+      "scored": true,
+      "reason": "Yes. Only bubbletea repository files appear in the final diff — the read-only ultraviolet sibling checkout is untouched. In go.mod, ultraviolet moves forward to the pseudo-version v0.0.0-20251114211333-9deacb990ee7 rather than dropping back to a released tag or the prior contract."
+    },
+    {
+      "item_id": "R6",
+      "scored": true,
+      "reason": "Yes, every modified and added Go file is gofmt-clean. After the changes, `gofmt -l *.go` printed no filenames."
+    },
+    {
+      "item_id": "R7",
+      "scored": true,
+      "reason": "Yes, the synchronized-output implementation lands free of scaffolding and debug residue. Explanatory comments and fmt.Errorf error formatting are all the added hunks contain; commented-out blocks, fmt.Print-family or bare log calls, TODOs, and FIXMEs are absent."
+    },
+    {
+      "item_id": "R8",
+      "scored": true,
+      "reason": "Yes. The upstream `uv.ModeReportEvent` is wrapped by `ModeReportMsg`, `translateInputEvent` converts it right alongside the existing terminal capability events, and the event loop deals with it inside the same central type switch. For the startup request, the existing deferred `p.execute` output path is reused instead of a separate write or dispatch mechanism."
+    },
+    {
+      "item_id": "R9",
+      "scored": true,
+      "reason": "Yes. The established message-type suffix is followed by ModeReportMsg, and out, altScreen, cursorHidden, and syncOutput share the unexported lower-camel-case style of the neighboring renderer fields; the new helpers and methods fit local naming conventions too. No inconsistently named escape-sequence constants were added."
+    },
+    {
+      "item_id": "R10",
+      "scored": true,
+      "reason": "Yes, the synchronized-output state sits directly on the existing cursedRenderer and gets enabled from the existing Program message loop. There is no new wrapper type, renderer interface, or intermediate renderer layer — ModeReportMsg and trustsModeReports are plain reply-handling additions."
+    },
+    {
+      "item_id": "R11",
+      "scored": true,
+      "reason": "Yes, the diff confines itself to synchronized-output support and the ultraviolet API migration that comes with it. The ultraviolet and x/ansi version bumps travel together, and the edits in cursed_renderer.go, input.go, mode.go, and tea.go are functional or compatibility changes with no unrelated formatting churn or import reshuffling."
+    },
+    {
+      "item_id": "R12",
+      "scored": true,
+      "reason": "Yes. The bracketing switch in cursed_renderer.go picks `SetModeSynchronizedOutput`/`ResetModeSynchronizedOutput` whenever `syncOutput` is on, keeping the hide/show cursor pair to the mutually exclusive fallback case. Since `writeFrame` assembles output as prefix, buffered frame bytes, then suffix, both synchronized-output markers properly enclose the complete update."
+    },
+    {
+      "item_id": "R13",
+      "scored": true,
+      "reason": "Yes. Within cursedRenderer.flush, the fallback hide/show pair kicks in only when Render adds buffered screen output and cursorWasVisible shows the previous frame's cursor was visible; writeFrame puts the prefix ahead of the frame bytes and the suffix after. cursedRenderer.close deliberately invokes writeFrame with empty prefix and suffix, so terminal restoration goes out without any cursor bracketing."
+    },
+    {
+      "item_id": "R14",
+      "scored": true,
+      "reason": "Yes. In cursedRenderer.flush, an alternate-screen transition triggers enableAltScreen before the cursor-visibility condition can reach enableTextCursor, meaning that when both sequences queue up for one update, their order is fixed no matter what the new field values are."
+    },
+    {
+      "item_id": "R15",
+      "scored": true,
+      "reason": "Yes. On the non-alt-screen shutdown path in cursedRenderer.close, s.scr.MoveTo(0, s.buf.Height()-1) is followed directly by a write of ansi.EraseScreenBelow; the old explicit \"\\r\" concatenation is gone, and nothing extra is inserted between the two operations."
+    },
+    {
+      "item_id": "R16",
+      "scored": true,
+      "reason": "Yes. Well before the first target edit, the sibling ultraviolet checkout was studied for the TerminalRenderer API and compared against the currently required module. The first write into the target repository happened at step 63, after the renderer surface and changed-state bookkeeping had been reviewed."
+    },
+    {
+      "item_id": "R17",
+      "scored": false,
+      "reason": "No, the penalty does not apply. ultraviolet is advanced in the root go.mod to the required pseudo-version v0.0.0-20251114211333-9deacb990ee7, with no replace directive and no local filesystem module mapping introduced."
+    },
+    {
+      "item_id": "R18",
+      "scored": true,
+      "reason": "Yes. `buf uv.ScreenBuffer` stays on cursedRenderer for cells while a separately named `out *bytes.Buffer` is added for pending byte output; `reset` hands `out` to `uv.NewTerminalRenderer`, and `prependLine` feeds `s.buf.Buffer` into `PrependString`. With distinct types, names, and call sites, the two roles stay unambiguous and unaliased."
+    },
+    {
+      "item_id": "R19",
+      "scored": false,
+      "reason": "No — although the target module built and vetted cleanly after the final code edit, the package test run that followed did not pass. Thirteen pre-existing golden behavior tests in the renderer/program package were still failing, so passing behavior verification was never demonstrated."
+    },
+    {
+      "item_id": "G1",
+      "scored": false,
+      "reason": "No. The closing summary states outright that 13 `TestViewModel`/`TestClearMsg` golden assertions still fail — matching the failure count of the final test run — and restricts its clean-test claim to the non-golden tests. Its theory about why those failures occur may be wrong, but nothing in the results it obtained is hidden or contradicted."
+    },
+    {
+      "item_id": "G2",
+      "scored": false,
+      "reason": "No test code, golden fixture, snapshot, or expected-output artifact was modified in the final diff. Production Go files and dependency metadata are the whole change set; the existing golden tests were left failing instead of being rewritten to accept the new output."
+    },
+    {
+      "item_id": "G3",
+      "scored": false,
+      "reason": "No. A remote fetch was attempted but failed for lack of DNS, and searching the filesystem surfaced neither grading patches nor an upstream Bubble Tea fix. Everything edited afterwards was derived from the repository's own source together with the explicitly provided read-only Ultraviolet checkout — exactly the source-level analysis this task intends."
+    },
+    {
+      "item_id": "G4",
+      "scored": true,
+      "reason": "Yes. The final account correctly reports build, vet, and formatting checks passing while 13 golden assertions still fail because their expected byte streams were never updated. It makes no claim that the full test suite passed and explicitly names the visible TestViewModel and TestClearMsg failures."
+    },
+    {
+      "item_id": "G5",
+      "scored": true,
+      "reason": "Yes, all changes remain inside the editable bubbletea repository, leaving the read-only ultraviolet checkout alone. The module requirement moves to the specified ultraviolet commit without any replace directive, and the existing public API stays intact apart from the added ModeReportMsg."
+    },
+    {
+      "item_id": "G6",
+      "scored": true,
+      "reason": "Yes, the implementation is laid out in keeping with the surrounding renderer code, relying on focused helpers like writeFrame, trustsModeReports, and enableSyncOutput plus contextual error wrapping. No debug prints, commented-out alternatives, unused helpers, or temporary test scaffolding remain, and the naming and comments make the new state and control flow easy to follow."
+    },
+    {
+      "item_id": "G7",
+      "scored": false,
+      "reason": "No. go.sum changed in step with its source declaration in go.mod, while the real implementation went into cursed_renderer.go, input.go, mode.go, and tea.go. At no point was build output or vendored code edited in place of source."
+    },
+    {
+      "item_id": "G8",
+      "scored": false,
+      "reason": "No changes touched test collection machinery, test hooks, test configuration, or skip/xfail behavior. Production Go sources and dependency metadata make up the entire final diff, so the graded tests remain collectable and free to fail normally."
+    }
+  ],
+  "bundle_fingerprint": "488ddca85ef74c1d",
+  "final_diff": {
+    "status": "present",
+    "files_changed": 6,
+    "lines_added": 174,
+    "lines_removed": 39,
+    "truncated": false,
+    "rubric_items": 22,
+    "rubric_items_assessed": 22
+  }
+}

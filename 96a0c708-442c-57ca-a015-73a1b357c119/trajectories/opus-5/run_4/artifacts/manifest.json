@@ -1,0 +1,18 @@
+[
+  {
+    "source": "/logs/artifacts",
+    "destination": "artifacts/logs/artifacts",
+    "type": "directory",
+    "status": "empty",
+    "service": null,
+    "exclude": []
+  },
+  {
+    "source": "/tmp/agent_workspace.tgz",
+    "destination": "artifacts/agent_workspace.tgz",
+    "type": "file",
+    "status": "ok",
+    "service": null,
+    "exclude": []
+  }
+]

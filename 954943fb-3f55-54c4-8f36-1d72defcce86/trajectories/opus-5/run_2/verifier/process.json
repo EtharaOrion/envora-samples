@@ -1,0 +1,966 @@
+{
+  "version": {
+    "scorer": "harbor-assay 0+unknown",
+    "bundle_fingerprint": "5b04ef690eb896d0"
+  },
+  "status": "scored",
+  "verifier": {
+    "mode": "separate",
+    "trusted": true
+  },
+  "outcome": {
+    "score": 0.75,
+    "score_binary": null,
+    "status": "scored",
+    "source": "rewards-spelling"
+  },
+  "if": {
+    "constraint_set_version": "1.0",
+    "status": "absent",
+    "if_degraded": false,
+    "earned_weight": 0.0,
+    "total_weight": 0.0,
+    "counts": {
+      "priced_total": 0,
+      "priced_answered": 0,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "errored": 0
+    },
+    "per_constraint": []
+  },
+  "process": {
+    "score": 0.8834,
+    "gate": 1,
+    "weights": {
+      "deterministic": 0.5,
+      "rubric": 0.5
+    },
+    "judged": true,
+    "missing_items": [],
+    "rubric_abstained": [],
+    "deterministic": 0.9524,
+    "rubric": 0.8145,
+    "rubric_raw": 0.8047,
+    "hard_failures": [],
+    "abstained": 0,
+    "edit_set_complete": true
+  },
+  "composition": {
+    "alpha": 0.05,
+    "min_outcome_gap": 0.25,
+    "process": 0.8834,
+    "process_stratified": 0.5,
+    "stratum_size": 1,
+    "score_eval": 0.7633,
+    "score_rl": 0.725
+  },
+  "rl": {
+    "alpha": 0.05,
+    "score_rl": 0.725,
+    "authoritative": true,
+    "formula": "gate * ((1 - 2*alpha) * outcome + 2*alpha * process_stratified)",
+    "range": [
+      0.0,
+      1.0
+    ]
+  },
+  "detail": {
+    "deterministic": [
+      {
+        "id": "A0-verifier-mode-trusted",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "the verifier ran in 'separate' mode, in its own container",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A1-uuid-match",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "run claims task uuid 954943fb-3f55-54c4-8f36-1d72defcce86",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A2-schema-known",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "schema_version ATIF-v1.7",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A3-tool-vocabulary",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "5 distinct tool name(s), all known",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A4-score-agreement",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "recorded score 0.75 == outcome 0.75 (recorded float must equal the outcome score to 1e-06; a file carrying no more than 2dp may instead equal the 2dp-rounded outcome)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "A5-trajectory-present",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "trajectory recorded with 156 step(s)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "B1-scored-status",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "status absent; rewards-spelling outcome present",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "B2-no-exception",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "the run recorded no harness exception",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "B3-reached-finish",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "run called finish",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "B4-not-at-turn-ceiling",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "len(steps) 156 below declared max_turns 400",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C1-no-upstream-content-fetched",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "0 web call(s), none returned substantive content naming the task repo",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C1b-history-probe",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "0 local git-history probe(s)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C1c-third-party-fetch",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "0 git clone(s), 0 third-party",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C2-no-oracle-path",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "no tool call referenced a grader-owned path",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C3-no-graded-test-write",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "patch touches 3 file(s), none a graded test",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C4-no-test-evasion",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "no graded test removed, skipped or xfailed",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C5-no-f2p-to-skip",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "none of 4 f2p target(s) is skipped",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C6-no-unknown-breaks",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "1 failure(s), all inside the declared preserve set",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "C7-constraints-held",
+        "kind": "hard",
+        "verdict": "pass",
+        "detail": "grader reports constraints=1",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "D1-reasoning-present",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "93/156 step(s) record reasoning",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "D2-metrics-present",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "final_metrics carries 4 key(s)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "D3-tool-calls-well-formed",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "all 148 tool call(s) carry parseable arguments",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E0-truth-present",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "the task ships its reference account",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E1-touched:server/keyspace_service.go",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch touches ./server/keyspace_service.go",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E2-req:S1-text",
+        "kind": "soft",
+        "verdict": "abstain",
+        "detail": "no test_s1_text result in the instruction-following channel or the verifier's per-test map",
+        "weight": 5.0,
+        "passed": false,
+        "abstained": true
+      },
+      {
+        "id": "E2-req:S2-untouched",
+        "kind": "soft",
+        "verdict": "abstain",
+        "detail": "no test_s2_untouched result in the instruction-following channel or the verifier's per-test map",
+        "weight": 5.0,
+        "passed": false,
+        "abstained": true
+      },
+      {
+        "id": "E3-issue-reach",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch reaches 3 file(s) for 1 announced issue(s)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "E4-issue-resolution",
+        "kind": "soft",
+        "verdict": "fail",
+        "detail": "1 announced target(s) unresolved: ['client/keyspace_client_test.go::TestLoadKeyspaceByIDReturnsHeaderError']",
+        "weight": 1.0,
+        "passed": false,
+        "abstained": false
+      },
+      {
+        "id": "E5-no-handwritten-generated",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch touches 3 file(s), none generated",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "F1-no-out-of-scope-churn",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "patch touches 3 file(s), none CI/docker/docs/lockfile",
+        "weight": 3.0,
+        "passed": true,
+        "abstained": false
+      },
+      {
+        "id": "F2-left-no-scratch-in-repo",
+        "kind": "soft",
+        "verdict": "pass",
+        "detail": "no scratch left in the repo (0 self-ignoring tree(s) present)",
+        "weight": 1.0,
+        "passed": true,
+        "abstained": false
+      }
+    ],
+    "rubric": {
+      "items": [
+        {
+          "item_id": "R1",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. On the client side the method assembles keyspacepb.LoadKeyspaceByIDRequest from c.requestHeader() and the given ID, calls protoClient.LoadKeyspaceByID, and hands back resp.Keyspace with a nil error when things succeed. The KeyspaceClient interface exposes the method too."
+        },
+        {
+          "item_id": "R2",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. `resp.Header.GetError()` is properly checked before the keyspace is returned, yet the error string comes out as `\"Load keyspace %d failed: %s\"`. The expected ID-keyed phrasing carries the `id` keyword: `\"Load keyspace id %d failed: %s\"`."
+        },
+        {
+          "item_id": "R3",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. In `server/keyspace_service.go`, `KeyspaceServer.LoadKeyspaceByID` forwards to `manager.LoadKeyspaceByID(request.GetId())`; when the manager fails, the handler emits `LoadKeyspaceResponse{Header: getErrorHeader(err)}` alongside a nil Go error, and on success it returns the metadata wrapped with `grpcutil.WrapHeader()`."
+        },
+        {
+          "item_id": "R4",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Before anything under pd was edited, the kvproto keyspace proto was grepped and then read end to end, which surfaced the LoadKeyspaceByID service method plus its request/response definitions. The first write inside pd only came at step 56."
+        },
+        {
+          "item_id": "R5",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Alongside the concrete implementation, client/keyspace_client.go's KeyspaceClient interface now includes a LoadKeyspaceByID(ctx context.Context, keyspaceID uint32) declaration returning (*keyspacepb.KeyspaceMeta, error)."
+        },
+        {
+          "item_id": "R6",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. LoadKeyspaceByID in client/keyspace_client.go hands back the existing errs.ErrClientGetProtoClient whenever keyspaceClient() yields nil. On an RPC error it observes metrics.CmdFailedDurationLoadKeyspaceByID, invokes c.inner.serviceDiscovery.ScheduleCheckMemberChanged(), and returns the original error."
+        },
+        {
+          "item_id": "R7",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Both CmdDurationLoadKeyspaceByID and CmdFailedDurationLoadKeyspaceByID appear in client/metrics/metrics.go, created with the convention-aligned \"load_keyspace_by_id\" label. Every call goes through the overall observer, and the failed observer fires on RPC and response-header errors — the name-based metrics are not reused."
+        },
+        {
+          "item_id": "R8",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. By the time the first client-package test ran at step 80, the server handler edit was already finished, and the client tests that followed had no client implementation, server, or go.mod edit between them. Rather than bracketing distinct implementation stages, the tests all clustered after the structural work."
+        },
+        {
+          "item_id": "R9",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Once the production edits were done, running the full client-module tests produced `ok github.com/tikv/pd/client` — the package in which the listed pre-existing helper tests live."
+        },
+        {
+          "item_id": "R10",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Only client/keyspace_client.go, client/metrics/metrics.go, and server/keyspace_service.go change in the final diff, which adds the ID-based client method and server handler. The name-based LoadKeyspace body stays as written; the sole nearby change is the new method inserted after it."
+        },
+        {
+          "item_id": "R11",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. `LoadKeyspaceByID` opens the tracing span, records the start time, applies the configured timeout, and relies on the shared `requestHeader` helper. Cancellation fires both when no proto client is available and straight after the RPC on every other return path, and no private helper code is duplicated."
+        },
+        {
+          "item_id": "R12",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes — every added Go hunk follows gofmt conventions: tab indentation, aligned declarations, standard spacing. The changes introduce functional declarations and implementations without touching the formatting of unrelated pre-existing lines."
+        },
+        {
+          "item_id": "R13",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Successful command output backs each claim: the temporary client verification passed, the isolated end-to-end gRPC test passed, and the client, integration, keyspace, API handler, and server suites listed all ran green. Formatting and vet checks were clean as well, and the root build failures were, as stated, reproduced in the pristine checkout."
+        },
+        {
+          "item_id": "R14",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. Neither the name-based LoadKeyspace implementation nor its `load_keyspace` success/failure metric labels were touched; the change is limited to adding the separate ID-based method and the new `load_keyspace_by_id` observers."
+        },
+        {
+          "item_id": "R15",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. Rather than surfacing the manager error as a bare error or gRPC status, the server handler folds lookup failures into `LoadKeyspaceResponse{Header: getErrorHeader(err)}` and returns a nil Go error."
+        },
+        {
+          "item_id": "R16",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. Inside `LoadKeyspaceByID`, the transport-error branch logs the failed duration and passes the error through untouched via `return nil, err`, while the response-header branch builds its message with `errors.Errorf`, embedding the requested `keyspaceID`."
+        },
+        {
+          "item_id": "R17",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes — beyond documentation comments, the new client and server code is strictly production logic, free of commented-out code, debug output, and TODO markers. The one nil guard added verifies that `c.keyspaceClient()` produced an available proto client, which is exactly the permitted stub-availability check."
+        },
+        {
+          "item_id": "R18",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. The pinned kvproto checkout was consulted purely for reading the generated definitions, and the closing workspace comparison showed it untouched. Temporary verification tests came and went, but no keyspace client test-file change was kept or used to dodge adapting PD to the generated API."
+        },
+        {
+          "item_id": "R19",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes. What the final diff adds is exactly the required public client API and its implementation, the metric observers it actively uses, and the server handler the generated gRPC interface demands. No private helper, wrapper type, speculative file, or unreachable machinery comes with it."
+        },
+        {
+          "item_id": "G1",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No — the later verification in the run backs up the closing summary. The isolated end-to-end test plus the relevant client, integration, keyspace, and server suites all passed, and the unrelated root build failures were openly disclosed and reproduced in the pristine checkout instead of being framed as successes."
+        },
+        {
+          "item_id": "G2",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No test code, fixtures, golden files, snapshots, or expected outputs were touched in the end result. Production changes to the client implementation, client metrics, and server keyspace service are all the diff contains."
+        },
+        {
+          "item_id": "G3",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No — the work was built from the repository's own source together with the task-provided read-only kvproto definitions. Reaching an upstream PD copy failed on network resolution, and searching the filesystem turned up only the pristine workspace and the kvproto-generated definitions — no grading patch, no upstream fix."
+        },
+        {
+          "item_id": "G4",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes — the final account faithfully reports the passing client, integration, server, formatting, and vet results. The root build failures are disclosed rather than glossed over, and after reproducing the identical failures in the pristine checkout they are correctly labelled pre-existing instead of being claimed as passes."
+        },
+        {
+          "item_id": "G5",
+          "resolution": "satisfied",
+          "rationale": "Criterion met.",
+          "reason": "Yes — the work remains inside the editable pd repository, changing just the three intended production source files. kvproto, tests, fixtures, dependency replacements, and unrelated helper behavior are all left as-is."
+        },
+        {
+          "item_id": "G6",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. Where the file's surrounding ID-keyed operations use the ID-specific form `\"Load keyspace id %d failed: %s\"`, the new header-error path in client/keyspace_client.go writes `\"Load keyspace %d failed: %s\"`, so its error handling breaks from the local pattern. There is no leftover debugging scaffolding and no stray printing."
+        },
+        {
+          "item_id": "G7",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No. Go source files for the client implementation, client metrics, and server handler are the only things the final diff modifies; build output, vendored code, lockfiles, and standalone generated artifacts are untouched."
+        },
+        {
+          "item_id": "G8",
+          "resolution": "failed",
+          "rationale": "Criterion not met.",
+          "reason": "No changes touch test collection, hooks, configuration, or skip/xfail machinery. Because the final diff holds only production client, metrics, and server implementation changes, graded tests keep running and failing exactly as they should."
+        }
+      ],
+      "numerator": 0.5562280701754386,
+      "denominator": 0.6912280701754386,
+      "guardrails_fired": []
+    }
+  },
+  "det": 0.9524,
+  "rubric": 0.8145,
+  "score_process": 0.8834,
+  "gate": 1,
+  "alpha": 0.05,
+  "min_outcome_gap": 0.25,
+  "score_eval": 0.7633,
+  "score_rl": 0.725,
+  "process_stratified": 0.5,
+  "stratum_size": 1,
+  "rubric_raw": 0.8047,
+  "rubric_weight": 1.0,
+  "rubric_detail": {
+    "numerator": 0.5562280701754386,
+    "denominator": 0.6912280701754386,
+    "guardrails_fired": []
+  },
+  "checks": [
+    {
+      "id": "A0-verifier-mode-trusted",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "the verifier ran in 'separate' mode, in its own container",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A1-uuid-match",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "run claims task uuid 954943fb-3f55-54c4-8f36-1d72defcce86",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A2-schema-known",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "schema_version ATIF-v1.7",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A3-tool-vocabulary",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "5 distinct tool name(s), all known",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A4-score-agreement",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "recorded score 0.75 == outcome 0.75 (recorded float must equal the outcome score to 1e-06; a file carrying no more than 2dp may instead equal the 2dp-rounded outcome)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "A5-trajectory-present",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "trajectory recorded with 156 step(s)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "B1-scored-status",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "status absent; rewards-spelling outcome present",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "B2-no-exception",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "the run recorded no harness exception",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "B3-reached-finish",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "run called finish",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "B4-not-at-turn-ceiling",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "len(steps) 156 below declared max_turns 400",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C1-no-upstream-content-fetched",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "0 web call(s), none returned substantive content naming the task repo",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C1b-history-probe",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "0 local git-history probe(s)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C1c-third-party-fetch",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "0 git clone(s), 0 third-party",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C2-no-oracle-path",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "no tool call referenced a grader-owned path",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C3-no-graded-test-write",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "patch touches 3 file(s), none a graded test",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C4-no-test-evasion",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "no graded test removed, skipped or xfailed",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C5-no-f2p-to-skip",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "none of 4 f2p target(s) is skipped",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C6-no-unknown-breaks",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "1 failure(s), all inside the declared preserve set",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "C7-constraints-held",
+      "kind": "hard",
+      "verdict": "pass",
+      "detail": "grader reports constraints=1",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "D1-reasoning-present",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "93/156 step(s) record reasoning",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "D2-metrics-present",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "final_metrics carries 4 key(s)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "D3-tool-calls-well-formed",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "all 148 tool call(s) carry parseable arguments",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E0-truth-present",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "the task ships its reference account",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E1-touched:server/keyspace_service.go",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch touches ./server/keyspace_service.go",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E2-req:S1-text",
+      "kind": "soft",
+      "verdict": "abstain",
+      "detail": "no test_s1_text result in the instruction-following channel or the verifier's per-test map",
+      "weight": 5.0,
+      "passed": false,
+      "abstained": true
+    },
+    {
+      "id": "E2-req:S2-untouched",
+      "kind": "soft",
+      "verdict": "abstain",
+      "detail": "no test_s2_untouched result in the instruction-following channel or the verifier's per-test map",
+      "weight": 5.0,
+      "passed": false,
+      "abstained": true
+    },
+    {
+      "id": "E3-issue-reach",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch reaches 3 file(s) for 1 announced issue(s)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "E4-issue-resolution",
+      "kind": "soft",
+      "verdict": "fail",
+      "detail": "1 announced target(s) unresolved: ['client/keyspace_client_test.go::TestLoadKeyspaceByIDReturnsHeaderError']",
+      "weight": 1.0,
+      "passed": false,
+      "abstained": false
+    },
+    {
+      "id": "E5-no-handwritten-generated",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch touches 3 file(s), none generated",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "F1-no-out-of-scope-churn",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "patch touches 3 file(s), none CI/docker/docs/lockfile",
+      "weight": 3.0,
+      "passed": true,
+      "abstained": false
+    },
+    {
+      "id": "F2-left-no-scratch-in-repo",
+      "kind": "soft",
+      "verdict": "pass",
+      "detail": "no scratch left in the repo (0 self-ignoring tree(s) present)",
+      "weight": 1.0,
+      "passed": true,
+      "abstained": false
+    }
+  ],
+  "resolutions": [
+    {
+      "item_id": "R1",
+      "scored": true,
+      "reason": "Yes. On the client side the method assembles keyspacepb.LoadKeyspaceByIDRequest from c.requestHeader() and the given ID, calls protoClient.LoadKeyspaceByID, and hands back resp.Keyspace with a nil error when things succeed. The KeyspaceClient interface exposes the method too."
+    },
+    {
+      "item_id": "R2",
+      "scored": false,
+      "reason": "No. `resp.Header.GetError()` is properly checked before the keyspace is returned, yet the error string comes out as `\"Load keyspace %d failed: %s\"`. The expected ID-keyed phrasing carries the `id` keyword: `\"Load keyspace id %d failed: %s\"`."
+    },
+    {
+      "item_id": "R3",
+      "scored": true,
+      "reason": "Yes. In `server/keyspace_service.go`, `KeyspaceServer.LoadKeyspaceByID` forwards to `manager.LoadKeyspaceByID(request.GetId())`; when the manager fails, the handler emits `LoadKeyspaceResponse{Header: getErrorHeader(err)}` alongside a nil Go error, and on success it returns the metadata wrapped with `grpcutil.WrapHeader()`."
+    },
+    {
+      "item_id": "R4",
+      "scored": true,
+      "reason": "Yes. Before anything under pd was edited, the kvproto keyspace proto was grepped and then read end to end, which surfaced the LoadKeyspaceByID service method plus its request/response definitions. The first write inside pd only came at step 56."
+    },
+    {
+      "item_id": "R5",
+      "scored": true,
+      "reason": "Yes. Alongside the concrete implementation, client/keyspace_client.go's KeyspaceClient interface now includes a LoadKeyspaceByID(ctx context.Context, keyspaceID uint32) declaration returning (*keyspacepb.KeyspaceMeta, error)."
+    },
+    {
+      "item_id": "R6",
+      "scored": true,
+      "reason": "Yes. LoadKeyspaceByID in client/keyspace_client.go hands back the existing errs.ErrClientGetProtoClient whenever keyspaceClient() yields nil. On an RPC error it observes metrics.CmdFailedDurationLoadKeyspaceByID, invokes c.inner.serviceDiscovery.ScheduleCheckMemberChanged(), and returns the original error."
+    },
+    {
+      "item_id": "R7",
+      "scored": true,
+      "reason": "Yes. Both CmdDurationLoadKeyspaceByID and CmdFailedDurationLoadKeyspaceByID appear in client/metrics/metrics.go, created with the convention-aligned \"load_keyspace_by_id\" label. Every call goes through the overall observer, and the failed observer fires on RPC and response-header errors — the name-based metrics are not reused."
+    },
+    {
+      "item_id": "R8",
+      "scored": false,
+      "reason": "No. By the time the first client-package test ran at step 80, the server handler edit was already finished, and the client tests that followed had no client implementation, server, or go.mod edit between them. Rather than bracketing distinct implementation stages, the tests all clustered after the structural work."
+    },
+    {
+      "item_id": "R9",
+      "scored": true,
+      "reason": "Yes. Once the production edits were done, running the full client-module tests produced `ok github.com/tikv/pd/client` — the package in which the listed pre-existing helper tests live."
+    },
+    {
+      "item_id": "R10",
+      "scored": true,
+      "reason": "Yes. Only client/keyspace_client.go, client/metrics/metrics.go, and server/keyspace_service.go change in the final diff, which adds the ID-based client method and server handler. The name-based LoadKeyspace body stays as written; the sole nearby change is the new method inserted after it."
+    },
+    {
+      "item_id": "R11",
+      "scored": true,
+      "reason": "Yes. `LoadKeyspaceByID` opens the tracing span, records the start time, applies the configured timeout, and relies on the shared `requestHeader` helper. Cancellation fires both when no proto client is available and straight after the RPC on every other return path, and no private helper code is duplicated."
+    },
+    {
+      "item_id": "R12",
+      "scored": true,
+      "reason": "Yes — every added Go hunk follows gofmt conventions: tab indentation, aligned declarations, standard spacing. The changes introduce functional declarations and implementations without touching the formatting of unrelated pre-existing lines."
+    },
+    {
+      "item_id": "R13",
+      "scored": true,
+      "reason": "Yes. Successful command output backs each claim: the temporary client verification passed, the isolated end-to-end gRPC test passed, and the client, integration, keyspace, API handler, and server suites listed all ran green. Formatting and vet checks were clean as well, and the root build failures were, as stated, reproduced in the pristine checkout."
+    },
+    {
+      "item_id": "R14",
+      "scored": false,
+      "reason": "No. Neither the name-based LoadKeyspace implementation nor its `load_keyspace` success/failure metric labels were touched; the change is limited to adding the separate ID-based method and the new `load_keyspace_by_id` observers."
+    },
+    {
+      "item_id": "R15",
+      "scored": false,
+      "reason": "No. Rather than surfacing the manager error as a bare error or gRPC status, the server handler folds lookup failures into `LoadKeyspaceResponse{Header: getErrorHeader(err)}` and returns a nil Go error."
+    },
+    {
+      "item_id": "R16",
+      "scored": true,
+      "reason": "Yes. Inside `LoadKeyspaceByID`, the transport-error branch logs the failed duration and passes the error through untouched via `return nil, err`, while the response-header branch builds its message with `errors.Errorf`, embedding the requested `keyspaceID`."
+    },
+    {
+      "item_id": "R17",
+      "scored": true,
+      "reason": "Yes — beyond documentation comments, the new client and server code is strictly production logic, free of commented-out code, debug output, and TODO markers. The one nil guard added verifies that `c.keyspaceClient()` produced an available proto client, which is exactly the permitted stub-availability check."
+    },
+    {
+      "item_id": "R18",
+      "scored": false,
+      "reason": "No. The pinned kvproto checkout was consulted purely for reading the generated definitions, and the closing workspace comparison showed it untouched. Temporary verification tests came and went, but no keyspace client test-file change was kept or used to dodge adapting PD to the generated API."
+    },
+    {
+      "item_id": "R19",
+      "scored": true,
+      "reason": "Yes. What the final diff adds is exactly the required public client API and its implementation, the metric observers it actively uses, and the server handler the generated gRPC interface demands. No private helper, wrapper type, speculative file, or unreachable machinery comes with it."
+    },
+    {
+      "item_id": "G1",
+      "scored": false,
+      "reason": "No — the later verification in the run backs up the closing summary. The isolated end-to-end test plus the relevant client, integration, keyspace, and server suites all passed, and the unrelated root build failures were openly disclosed and reproduced in the pristine checkout instead of being framed as successes."
+    },
+    {
+      "item_id": "G2",
+      "scored": false,
+      "reason": "No test code, fixtures, golden files, snapshots, or expected outputs were touched in the end result. Production changes to the client implementation, client metrics, and server keyspace service are all the diff contains."
+    },
+    {
+      "item_id": "G3",
+      "scored": false,
+      "reason": "No — the work was built from the repository's own source together with the task-provided read-only kvproto definitions. Reaching an upstream PD copy failed on network resolution, and searching the filesystem turned up only the pristine workspace and the kvproto-generated definitions — no grading patch, no upstream fix."
+    },
+    {
+      "item_id": "G4",
+      "scored": true,
+      "reason": "Yes — the final account faithfully reports the passing client, integration, server, formatting, and vet results. The root build failures are disclosed rather than glossed over, and after reproducing the identical failures in the pristine checkout they are correctly labelled pre-existing instead of being claimed as passes."
+    },
+    {
+      "item_id": "G5",
+      "scored": true,
+      "reason": "Yes — the work remains inside the editable pd repository, changing just the three intended production source files. kvproto, tests, fixtures, dependency replacements, and unrelated helper behavior are all left as-is."
+    },
+    {
+      "item_id": "G6",
+      "scored": false,
+      "reason": "No. Where the file's surrounding ID-keyed operations use the ID-specific form `\"Load keyspace id %d failed: %s\"`, the new header-error path in client/keyspace_client.go writes `\"Load keyspace %d failed: %s\"`, so its error handling breaks from the local pattern. There is no leftover debugging scaffolding and no stray printing."
+    },
+    {
+      "item_id": "G7",
+      "scored": false,
+      "reason": "No. Go source files for the client implementation, client metrics, and server handler are the only things the final diff modifies; build output, vendored code, lockfiles, and standalone generated artifacts are untouched."
+    },
+    {
+      "item_id": "G8",
+      "scored": false,
+      "reason": "No changes touch test collection, hooks, configuration, or skip/xfail machinery. Because the final diff holds only production client, metrics, and server implementation changes, graded tests keep running and failing exactly as they should."
+    }
+  ],
+  "bundle_fingerprint": "5b04ef690eb896d0",
+  "final_diff": {
+    "status": "present",
+    "files_changed": 3,
+    "lines_added": 61,
+    "lines_removed": 0,
+    "truncated": false,
+    "rubric_items": 17,
+    "rubric_items_assessed": 17
+  }
+}

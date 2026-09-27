@@ -1,0 +1,137 @@
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/context/context.go ./pkg/distsql/context/context.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/context/context.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/distsql/context/context.go	2026-09-25 17:35:02.000000000 +0000
+@@ -63,17 +63,19 @@
+ 	TiFlashQuerySpillRatio               float64
+ 	TiFlashHashJoinVersion               string
+ 
+-	DistSQLConcurrency            int
+-	ReplicaReadType               kv.ReplicaReadType
+-	WeakConsistency               bool
+-	RCCheckTS                     bool
+-	NotFillCache                  bool
+-	TaskID                        uint64
+-	Priority                      mysql.PriorityEnum
+-	ResourceGroupTagger           *kv.ResourceGroupTagBuilder
+-	EnablePaging                  bool
+-	MinPagingSize                 int
+-	MaxPagingSize                 int
++	DistSQLConcurrency  int
++	ReplicaReadType     kv.ReplicaReadType
++	WeakConsistency     bool
++	RCCheckTS           bool
++	NotFillCache        bool
++	TaskID              uint64
++	Priority            mysql.PriorityEnum
++	ResourceGroupTagger *kv.ResourceGroupTagBuilder
++	EnablePaging        bool
++	MinPagingSize       int
++	MaxPagingSize       int
++	// PagingSizeBytes is the byte-sized paging budget, 0 means disabled.
++	PagingSizeBytes               uint64
+ 	RequestSourceType             string
+ 	ExplicitRequestSourceType     string
+ 	StoreBatchSize                int
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/request_builder.go ./pkg/distsql/request_builder.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/request_builder.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/distsql/request_builder.go	2026-09-25 18:10:48.000000000 +0000
+@@ -363,6 +363,7 @@
+ 		builder.SetPaging(dctx.EnablePaging)
+ 		builder.Request.Paging.MinPagingSize = uint64(dctx.MinPagingSize)
+ 		builder.Request.Paging.MaxPagingSize = uint64(dctx.MaxPagingSize)
++		builder.Request.Paging.PagingSizeBytes = dctx.PagingSizeBytes
+ 	}
+ 	builder.RequestSource.RequestSourceInternal = dctx.InRestrictedSQL
+ 	builder.RequestSource.RequestSourceType = dctx.RequestSourceType
+diff -ruN /opt/pristine/workspace/tidb/pkg/kv/kv.go ./pkg/kv/kv.go
+--- /opt/pristine/workspace/tidb/pkg/kv/kv.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/kv/kv.go	2026-09-25 17:33:30.000000000 +0000
+@@ -637,6 +637,11 @@
+ 		// when enabled, this field is adjusted to be max(MaxPagingSize, paging.MinAllowedMaxPagingSize),
+ 		// see paging.GrowPagingSize
+ 		MaxPagingSize uint64
++		// PagingSizeBytes is the byte-sized paging budget used when Paging is true.
++		// It is 0 when it's disabled, otherwise it should be a positive number. When
++		// it's set, the coprocessor stops scanning the current page once the
++		// accumulated scanned bytes reach this limit.
++		PagingSizeBytes uint64
+ 	}
+ 	// RequestSource indicates whether the request is an internal request.
+ 	RequestSource util.RequestSource
+diff -ruN /opt/pristine/workspace/tidb/pkg/store/copr/coprocessor.go ./pkg/store/copr/coprocessor.go
+--- /opt/pristine/workspace/tidb/pkg/store/copr/coprocessor.go	2026-09-21 22:43:06.000000000 +0000
++++ ./pkg/store/copr/coprocessor.go	2026-09-25 18:10:49.000000000 +0000
+@@ -290,10 +290,11 @@
+ 	cmdType   tikvrpc.CmdType
+ 	storeType kv.StoreType
+ 
+-	eventCb       trxevents.EventCallback
+-	paging        bool
+-	pagingSize    uint64
+-	pagingTaskIdx uint32
++	eventCb         trxevents.EventCallback
++	paging          bool
++	pagingSize      uint64
++	pagingSizeBytes uint64
++	pagingTaskIdx   uint32
+ 
+ 	partitionIndex int64 // used by balanceBatchCopTask in PartitionTableScan
+ 	requestSource  util.RequestSource
+@@ -661,6 +662,9 @@
+ 		if req.Paging.Enable {
+ 			pagingSize = req.Paging.MinPagingSize
+ 		}
++		// The byte-sized paging budget doesn't grow between rounds, it bounds the
++		// byte volume of a single page, 0 means it is disabled.
++		pagingSizeBytes := req.Paging.PagingSizeBytes
+ 		for i := 0; i < rLen; {
+ 			nextI := min(i+rangesPerTaskLimit, rLen)
+ 			hint := -1
+@@ -694,6 +698,7 @@
+ 				eventCb:           eventCb,
+ 				paging:            req.Paging.Enable,
+ 				pagingSize:        pagingSize,
++				pagingSizeBytes:   pagingSizeBytes,
+ 				requestSource:     req.RequestSource,
+ 				RowCountHint:      hint,
+ 				busyThreshold:     req.StoreBusyThreshold,
+@@ -721,6 +726,7 @@
+ 					// disable paging for small limit.
+ 					task.paging = false
+ 					task.pagingSize = 0
++					task.pagingSizeBytes = 0
+ 				} else {
+ 					pagingSize = paging.GrowPagingSize(pagingSize, req.Paging.MaxPagingSize)
+ 				}
+@@ -848,6 +854,7 @@
+ 			// disable paging for batched task.
+ 			b.tasks[idx].paging = false
+ 			b.tasks[idx].pagingSize = 0
++			b.tasks[idx].pagingSizeBytes = 0
+ 			// The task and it's batched can be served only in the store we chose.
+ 			// If the task is redirected to other replica, the batched task may not meet region-miss or store-not-match error.
+ 			// So disable busy threshold for the task which carries batched tasks.
+@@ -858,6 +865,7 @@
+ 		}
+ 		batchedTask.task.paging = false
+ 		batchedTask.task.pagingSize = 0
++		batchedTask.task.pagingSizeBytes = 0
+ 		batchedTask.task.busyThreshold = 0
+ 		b.tasks[idx].batchTaskList[task.taskID] = batchedTask
+ 	}
+@@ -1727,6 +1735,7 @@
+ 		Ranges:          task.ranges.ToPBRanges(),
+ 		SchemaVer:       worker.req.SchemaVar,
+ 		PagingSize:      task.pagingSize,
++		PagingSizeBytes: task.pagingSizeBytes,
+ 		MaxKeysRead:     taskMaxKeysRead,
+ 		Tasks:           task.ToPBBatchTasks(),
+ 		ConnectionId:    worker.req.ConnID,
+@@ -1932,6 +1941,7 @@
+ 		// If there is region error or lock error, keep the paging size and retry.
+ 		for _, remainedTask := range result.remains {
+ 			remainedTask.pagingSize = task.pagingSize
++			remainedTask.pagingSizeBytes = task.pagingSizeBytes
+ 		}
+ 		return result, nil
+ 	}

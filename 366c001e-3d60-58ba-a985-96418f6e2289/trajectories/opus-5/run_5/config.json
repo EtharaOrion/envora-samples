@@ -1,0 +1,26 @@
+{
+    "task": {
+        "path": "/tmp/harbor_task.vgbvnxrd/366c001e-3d60-58ba-a985-96418f6e2289"
+    },
+    "trial_name": "366c001e-3d60-58ba-a985-96418f6e__tUtkp2x",
+    "trials_dir": "/home/ec2-user/pass8-opus5/slots/5/jobs/2026-09-24__12-47-08",
+    "agent_timeout_multiplier": 3.0,
+    "environment_build_timeout_multiplier": 4.0,
+    "agent": {
+        "name": "crossrepo_harness.adapters.prebaked_openhands:PrebakedOpenHands",
+        "model_name": "anthropic/claude-opus-5",
+        "env": {
+            "LLM_BASE_URL": "http://10.99.2.1:8765",
+            "LLM_API_KEY": "kaij****tub",
+            "LLM_DROP_PARAMS": "true"
+        }
+    },
+    "environment": {
+        "type": "docker",
+        "delete": false,
+        "extra_docker_compose": [
+            "/home/ec2-user/pass8-opus5/seal.yaml"
+        ]
+    },
+    "job_id": "619bb0e8-05fa-4188-b2e0-368d59e04222"
+}

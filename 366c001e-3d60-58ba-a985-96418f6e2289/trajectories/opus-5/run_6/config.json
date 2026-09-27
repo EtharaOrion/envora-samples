@@ -1,0 +1,26 @@
+{
+    "task": {
+        "path": "/tmp/harbor_task.17b1qx7e/366c001e-3d60-58ba-a985-96418f6e2289"
+    },
+    "trial_name": "366c001e-3d60-58ba-a985-96418f6e__SKupgFg",
+    "trials_dir": "/home/ec2-user/Rahul_working/envora-harness-1/runs/pool-a154-opus-a1-172305/output/2026-09-25__17-23-06",
+    "agent_timeout_multiplier": 4.0,
+    "environment_build_timeout_multiplier": 4.0,
+    "agent": {
+        "name": "crossrepo_harness.adapters.prebaked_openhands:PrebakedOpenHands",
+        "model_name": "anthropic/claude-opus-5",
+        "extra_allowed_hosts": [
+            "cc-bridge-internal"
+        ],
+        "env": {
+            "LLM_BASE_URL": "http://cc-bridge-internal:8765",
+            "LLM_API_KEY": "kaij****tub",
+            "LLM_DROP_PARAMS": "true"
+        }
+    },
+    "environment": {
+        "type": "docker",
+        "delete": false
+    },
+    "job_id": "7ad01e9a-7917-4851-99fc-c7879bf69d41"
+}

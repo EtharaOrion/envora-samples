@@ -1,0 +1,33 @@
+{
+  "reward_authority": "outcome",
+  "outcome": 1.0,
+  "resolved": true,
+  "all_f2p_green": true,
+  "all_p2p_green": true,
+  "reference_ok": true,
+  "constraints": 1.0,
+  "aggregate_deterministic": 1.0,
+  "reward": 1.0,
+  "test_patch_apply_path": "git-apply",
+  "tamper": 0,
+  "tamper_reasons": [],
+  "stripped_paths": [],
+  "f2p_declared": 4,
+  "f2p_ran": 4,
+  "f2p_passed": 4,
+  "p2p_declared": 5,
+  "p2p_ran": 5,
+  "p2p_passed": 5,
+  "unmatched_declared": 0,
+  "tests": {
+    "client/keyspace_client_test.go::TestLoadKeyspaceByID": "passed",
+    "client/keyspace_client_test.go::TestLoadKeyspaceByIDReturnsHeaderError": "passed",
+    "client/keyspace_client_test.go::TestLoadKeyspaceByIDReturnsProtoClientError": "passed",
+    "client/keyspace_client_test.go::TestLoadKeyspaceByIDReturnsRPCError": "passed",
+    "client/client_test.go::TestTSLessEqual": "passed",
+    "client/client_test.go::TestIsRetryableGetTSError": "passed",
+    "client/client_test.go::TestRoundUpDurationToSeconds": "passed",
+    "client/client_test.go::TestSaturatingStdDurationFromSeconds": "passed",
+    "client/client_test.go::TestIsKeyspaceUsingKeyspaceLevelGC": "passed"
+  }
+}

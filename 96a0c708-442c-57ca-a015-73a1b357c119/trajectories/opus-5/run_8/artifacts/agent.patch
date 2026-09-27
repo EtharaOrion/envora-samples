@@ -1,0 +1,395 @@
+diff -ruN /opt/pristine/workspace/bubbletea/cursed_renderer.go ./cursed_renderer.go
+--- /opt/pristine/workspace/bubbletea/cursed_renderer.go	2026-09-23 13:01:16.000000000 +0000
++++ ./cursed_renderer.go	2026-09-25 08:33:44.000000000 +0000
+@@ -1,6 +1,7 @@
+ package tea
+ 
+ import (
++	"bytes"
+ 	"fmt"
+ 	"image/color"
+ 	"io"
+@@ -14,7 +15,11 @@
+ )
+ 
+ type cursedRenderer struct {
+-	w             io.Writer
++	w io.Writer
++	// out buffers the output of the terminal renderer until it gets written to
++	// [cursedRenderer.w]. This allows us to write a whole screen update at
++	// once, and bracket it with the necessary escape sequences.
++	out           bytes.Buffer
+ 	scr           *uv.TerminalRenderer
+ 	buf           uv.ScreenBuffer
+ 	lastView      *View
+@@ -29,6 +34,9 @@
+ 	backspace     bool // whether to use backspace to optimize cursor movements
+ 	mapnl         bool
+ 	prependLines  []string
++	altScreen     bool // whether the alternate screen buffer is in use
++	cursorHidden  bool // whether the text cursor is hidden
++	syncOutput    bool // whether to use synchronized output mode
+ }
+ 
+ var _ renderer = &cursedRenderer{}
+@@ -64,6 +72,14 @@
+ 	s.mu.Unlock()
+ }
+ 
++// setSyncOutput sets whether the renderer should use synchronized output mode
++// to write screen updates.
++func (s *cursedRenderer) setSyncOutput(v bool) {
++	s.mu.Lock()
++	s.syncOutput = v
++	s.mu.Unlock()
++}
++
+ // start implements renderer.
+ func (s *cursedRenderer) start() {
+ 	s.mu.Lock()
+@@ -73,11 +89,12 @@
+ 		return
+ 	}
+ 
+-	if s.lastView.AltScreen {
+-		enableAltScreen(s, true)
+-	}
++	// The terminal was restored to its initial state when the renderer was
++	// closed, so we need to reapply the alternate screen and text cursor states
++	// of the last view.
++	applyScreenState(s, s.lastView.AltScreen, s.lastView.Cursor == nil)
++
+ 	if s.lastView.Cursor != nil {
+-		enableTextCursor(s, true)
+ 		if s.lastView.Cursor.Color != nil {
+ 			col, ok := colorful.MakeColor(s.lastView.Cursor.Color)
+ 			if ok {
+@@ -142,10 +159,10 @@
+ 		} else {
+ 			// Go to the bottom of the screen.
+ 			s.scr.MoveTo(0, s.buf.Height()-1)
+-			_, _ = s.scr.WriteString("\r" + ansi.EraseScreenBelow)
++			_, _ = s.scr.WriteString(ansi.EraseScreenBelow)
+ 		}
+ 		if lv.Cursor == nil {
+-			s.scr.ShowCursor()
++			_, _ = s.scr.WriteString(ansi.SetModeTextCursorEnable)
+ 		}
+ 		if !lv.DisableBracketedPasteMode {
+ 			_, _ = s.scr.WriteString(ansi.ResetBracketedPasteMode)
+@@ -192,8 +209,10 @@
+ 		_, _ = s.scr.WriteString(ansi.KittyKeyboard(0, 1))
+ 	}
+ 
+-	if err := s.scr.Flush(); err != nil {
+-		return fmt.Errorf("bubbletea: error closing screen writer: %w", err)
++	// This write restores the terminal, it's not a screen update, so we don't
++	// bracket it.
++	if err := writeOut(s, "", ""); err != nil {
++		return err
+ 	}
+ 
+ 	x, y := s.scr.Position()
+@@ -216,6 +235,36 @@
+ 	return s.scr.WriteString(str) //nolint:wrapcheck
+ }
+ 
++// writeOut flushes the pending terminal renderer output to the underlying
++// writer. When there's output to write, it gets bracketed with the given prefix
++// and suffix and written in a single write.
++func writeOut(s *cursedRenderer, prefix, suffix string) error {
++	if err := s.scr.Flush(); err != nil {
++		return fmt.Errorf("bubbletea: error flushing screen writer: %w", err)
++	}
++	if s.out.Len() == 0 {
++		// Nothing to write.
++		return nil
++	}
++
++	defer s.out.Reset()
++
++	bts := s.out.Bytes()
++	if len(prefix) > 0 || len(suffix) > 0 {
++		buf := make([]byte, 0, len(prefix)+len(bts)+len(suffix))
++		buf = append(buf, prefix...)
++		buf = append(buf, bts...)
++		buf = append(buf, suffix...)
++		bts = buf
++	}
++
++	if _, err := s.w.Write(bts); err != nil {
++		return fmt.Errorf("bubbletea: error writing to output: %w", err)
++	}
++
++	return nil
++}
++
+ // flush implements renderer.
+ func (s *cursedRenderer) flush(closing bool) error {
+ 	s.mu.Lock()
+@@ -227,10 +276,20 @@
+ 		return nil
+ 	}
+ 
+-	// Alt screen mode.
+-	enableAltScreen(s, view.AltScreen)
+-	// Cursor visibility.
+-	enableTextCursor(s, view.Cursor != nil)
++	// Bracket the screen update to avoid flickering. When the terminal supports
++	// synchronized output, we mark the whole update as a single atomic batch.
++	// Otherwise, we fall back to hiding the text cursor while the update is
++	// being written to the terminal.
++	var prefix, suffix string
++	switch {
++	case s.syncOutput:
++		prefix, suffix = ansi.SetModeSynchronizedOutput, ansi.ResetModeSynchronizedOutput
++	case s.lastView != nil && s.lastView.Cursor != nil:
++		prefix, suffix = ansi.ResetModeTextCursorEnable, ansi.SetModeTextCursorEnable
++	}
++
++	// Alt screen mode and text cursor visibility.
++	applyScreenState(s, view.AltScreen, view.Cursor == nil)
+ 
+ 	// Push prepended lines if any.
+ 	if len(s.prependLines) > 0 {
+@@ -388,8 +447,8 @@
+ 		}
+ 	}
+ 
+-	if err := s.scr.Flush(); err != nil {
+-		return fmt.Errorf("bubbletea: error flushing screen writer: %w", err)
++	if err := writeOut(s, prefix, suffix); err != nil {
++		return err
+ 	}
+ 
+ 	s.lastView = &view
+@@ -485,24 +544,24 @@
+ }
+ 
+ func reset(s *cursedRenderer) {
+-	scr := uv.NewTerminalRenderer(s.w, s.env)
++	s.out.Reset()
++	// The renderer writes to an intermediate buffer so that we can bracket and
++	// write a whole screen update to the output at once.
++	scr := uv.NewTerminalRenderer(&s.out, s.env)
+ 	scr.SetColorProfile(s.profile)
+-	scr.SetRelativeCursor(s.lastView == nil || !s.lastView.AltScreen)
++	scr.SetFullscreen(false)
++	scr.SetRelativeCursor(true)
+ 	scr.SetTabStops(s.width)
+ 	scr.SetBackspace(s.backspace)
+ 	scr.SetMapNewline(s.mapnl)
+ 	scr.SetLogger(s.logger)
+-	if s.lastView != nil && s.lastView.AltScreen {
+-		scr.EnterAltScreen()
+-	} else {
+-		scr.ExitAltScreen()
+-	}
+-	if s.lastView != nil && s.lastView.Cursor != nil {
+-		scr.ShowCursor()
+-	} else {
+-		scr.HideCursor()
+-	}
+ 	s.scr = scr
++
++	// The terminal is in its original state, i.e. on the main screen with a
++	// visible text cursor. [cursedRenderer.start] takes care of reapplying the
++	// state of the last view.
++	s.altScreen = false
++	s.cursorHidden = false
+ }
+ 
+ // setColorProfile implements renderer.
+@@ -544,14 +603,32 @@
+ 	s.mu.Unlock()
+ }
+ 
+-// enableAltScreen sets the alt screen mode.
++// applyScreenState queues the escape sequences to bring the terminal alternate
++// screen and text cursor visibility in line with the given states. Sequences
++// are only queued for states that actually change.
++func applyScreenState(s *cursedRenderer, altScreen, cursorHidden bool) {
++	altScreenChanged := s.altScreen != altScreen
++	if altScreenChanged {
++		enableAltScreen(s, altScreen)
++	}
++	// NOTE: Some terminals reset the text cursor visibility when switching
++	// between the main and alternate screen, so we need to reapply it whenever
++	// we switch screens. This must come after the alternate screen sequence.
++	if s.cursorHidden != cursorHidden || altScreenChanged {
++		enableTextCursor(s, !cursorHidden)
++	}
++}
++
++// enableAltScreen sets the alt screen mode. This queues the escape sequence to
++// enter or exit the alternate screen buffer, and switches the renderer between
++// fullscreen and inline cursor positioning.
+ func enableAltScreen(s *cursedRenderer, enable bool) {
+ 	if enable {
+ 		s.scr.EnterAltScreen()
+ 	} else {
+ 		s.scr.ExitAltScreen()
+ 	}
+-	s.scr.SetRelativeCursor(!enable)
++	s.altScreen = enable
+ }
+ 
+ // enterAltScreen implements renderer.
+@@ -568,13 +645,14 @@
+ 	s.mu.Unlock()
+ }
+ 
+-// enableTextCursor sets the text cursor mode.
++// enableTextCursor sets the text cursor visibility.
+ func enableTextCursor(s *cursedRenderer, enable bool) {
+ 	if enable {
+-		s.scr.ShowCursor()
++		_, _ = s.scr.WriteString(ansi.SetModeTextCursorEnable)
+ 	} else {
+-		s.scr.HideCursor()
++		_, _ = s.scr.WriteString(ansi.ResetModeTextCursorEnable)
+ 	}
++	s.cursorHidden = !enable
+ }
+ 
+ // showCursor implements renderer.
+@@ -604,7 +682,7 @@
+ 		// If the line is wider than the screen, truncate it.
+ 		strLines[i] = ansi.Truncate(line, s.width, "")
+ 	}
+-	s.scr.PrependString(strings.Join(strLines, "\n"))
++	s.scr.PrependString(s.buf.Buffer, strings.Join(strLines, "\n"))
+ }
+ 
+ func setProgressBar(s *cursedRenderer, pb *ProgressBar) {
+diff -ruN /opt/pristine/workspace/bubbletea/go.mod ./go.mod
+--- /opt/pristine/workspace/bubbletea/go.mod	2026-09-23 13:01:23.000000000 +0000
++++ ./go.mod	2026-09-25 07:06:57.000000000 +0000
+@@ -8,8 +8,8 @@
+ 
+ require (
+ 	github.com/charmbracelet/colorprofile v0.3.3
+-	github.com/charmbracelet/ultraviolet v0.0.0-20251112162901-46098fed0961
+-	github.com/charmbracelet/x/ansi v0.11.1-0.20251110210702-903592506081
++	github.com/charmbracelet/ultraviolet v0.0.0-20251114211333-9deacb990ee7
++	github.com/charmbracelet/x/ansi v0.11.1
+ 	github.com/charmbracelet/x/exp/golden v0.0.0-20241212170349-ad4b7ae0f25f
+ 	github.com/charmbracelet/x/term v0.2.2
+ 	github.com/lucasb-eyer/go-colorful v1.3.0
+diff -ruN /opt/pristine/workspace/bubbletea/go.sum ./go.sum
+--- /opt/pristine/workspace/bubbletea/go.sum	2026-09-23 13:01:23.000000000 +0000
++++ ./go.sum	2026-09-25 07:06:57.000000000 +0000
+@@ -2,10 +2,10 @@
+ github.com/aymanbagabas/go-udiff v0.2.0/go.mod h1:RE4Ex0qsGkTAJoQdQQCA0uG+nAzJO/pI/QwceO5fgrA=
+ github.com/charmbracelet/colorprofile v0.3.3 h1:DjJzJtLP6/NZ8p7Cgjno0CKGr7wwRJGxWUwh2IyhfAI=
+ github.com/charmbracelet/colorprofile v0.3.3/go.mod h1:nB1FugsAbzq284eJcjfah2nhdSLppN2NqvfotkfRYP4=
+-github.com/charmbracelet/ultraviolet v0.0.0-20251112162901-46098fed0961 h1:qneAb6lrvZEaliI3g91vFDYf4kCpotKU0bRXijfHRqA=
+-github.com/charmbracelet/ultraviolet v0.0.0-20251112162901-46098fed0961/go.mod h1:ung4G52QJm6rlFYPYqPelzBHWWy966P9VMonX7UGT5g=
+-github.com/charmbracelet/x/ansi v0.11.1-0.20251110210702-903592506081 h1:gWeRo2N77OeiZAL47lzvIot9VPpTzxT5ahdzQIyHEDY=
+-github.com/charmbracelet/x/ansi v0.11.1-0.20251110210702-903592506081/go.mod h1:M49wjzpIujwPceJ+t5w3qh2i87+HRtHohgb5iTyepL0=
++github.com/charmbracelet/ultraviolet v0.0.0-20251114211333-9deacb990ee7 h1:PeoXe8fG5yb6uaimw4Om9eiXL74MzFSwSj3coBtDPmY=
++github.com/charmbracelet/ultraviolet v0.0.0-20251114211333-9deacb990ee7/go.mod h1:6lfcr3MNP+kZR25sF1nQwJFuQnNYBlFy3PGX5rvslXc=
++github.com/charmbracelet/x/ansi v0.11.1 h1:iXAC8SyMQDJgtcz9Jnw+HU8WMEctHzoTAETIeA3JXMk=
++github.com/charmbracelet/x/ansi v0.11.1/go.mod h1:M49wjzpIujwPceJ+t5w3qh2i87+HRtHohgb5iTyepL0=
+ github.com/charmbracelet/x/exp/golden v0.0.0-20241212170349-ad4b7ae0f25f h1:UytXHv0UxnsDFmL/7Z9Q5SBYPwSuRLXHbwx+6LycZ2w=
+ github.com/charmbracelet/x/exp/golden v0.0.0-20241212170349-ad4b7ae0f25f/go.mod h1:wDlXFlCrmJ8J+swcL/MnGUuYnqgQdW9rhSD61oNMb6U=
+ github.com/charmbracelet/x/term v0.2.2 h1:xVRT/S2ZcKdhhOuSP4t5cLi5o+JxklsoEObBSgfgZRk=
+diff -ruN /opt/pristine/workspace/bubbletea/input.go ./input.go
+--- /opt/pristine/workspace/bubbletea/input.go	2026-09-23 13:01:16.000000000 +0000
++++ ./input.go	2026-09-25 08:20:25.000000000 +0000
+@@ -47,6 +47,8 @@
+ 		return TerminalVersionMsg(e)
+ 	case uv.KeyboardEnhancementsEvent:
+ 		return KeyboardEnhancementsMsg(e)
++	case uv.ModeReportEvent:
++		return ModeReportMsg(e)
+ 	}
+ 	return e
+ }
+diff -ruN /opt/pristine/workspace/bubbletea/mode.go ./mode.go
+--- /opt/pristine/workspace/bubbletea/mode.go	1970-01-01 00:00:00.000000000 +0000
++++ ./mode.go	2026-09-25 08:20:20.000000000 +0000
+@@ -0,0 +1,51 @@
++package tea
++
++import (
++	uv "github.com/charmbracelet/ultraviolet"
++	"github.com/charmbracelet/x/ansi"
++)
++
++// ModeReportMsg is a message that represents a terminal DEC mode report
++// (DECRPM). Mode reports are generated by the terminal in response to a mode
++// request such as [ansi.RequestModeSynchronizedOutput].
++//
++// See: https://vt100.net/docs/vt510-rm/DECRPM.html
++type ModeReportMsg struct {
++	// Mode is the mode being reported.
++	Mode ansi.Mode
++
++	// Value is the reported mode setting.
++	Value ansi.ModeSetting
++}
++
++// requestSyncOutput queries the terminal for synchronized output mode support
++// unless the terminal can't be trusted to answer it.
++func (p *Program) requestSyncOutput() {
++	if distrustsSyncOutput(p.environ) {
++		return
++	}
++	p.execute(ansi.RequestModeSynchronizedOutput)
++}
++
++// distrustsSyncOutput reports whether the terminal described by the given
++// environment can be trusted to correctly answer a synchronized output mode
++// request. We'd rather ask than not, so this only returns true for terminals we
++// have a positive reason to distrust.
++func distrustsSyncOutput(env uv.Environ) bool {
++	if !isRemoteSession(env) {
++		return false
++	}
++	// We're on a remote session. Unless the terminal identifies itself, we
++	// can't tell whether it will answer the request at all.
++	return env.Getenv("TERM_PROGRAM") == ""
++}
++
++// isRemoteSession reports whether we're running in a remote session.
++func isRemoteSession(env uv.Environ) bool {
++	for _, k := range []string{"SSH_TTY", "SSH_CONNECTION", "SSH_CLIENT"} {
++		if v := env.Getenv(k); v != "" {
++			return true
++		}
++	}
++	return false
++}
+diff -ruN /opt/pristine/workspace/bubbletea/tea.go ./tea.go
+--- /opt/pristine/workspace/bubbletea/tea.go	2026-09-23 13:01:16.000000000 +0000
++++ ./tea.go	2026-09-25 08:31:51.000000000 +0000
+@@ -756,6 +756,16 @@
+ 					}
+ 				}
+ 
++			case ModeReportMsg:
++				if msg.Mode == ansi.Mode(ansi.ModeSynchronizedOutput) && msg.Value.IsReset() {
++					// The terminal recognizes synchronized output and it's
++					// currently off, so we can use it to write screen updates
++					// atomically.
++					if r, ok := p.renderer.(*cursedRenderer); ok {
++						r.setSyncOutput(true)
++					}
++				}
++
+ 			case MouseMsg:
+ 				for _, m := range p.renderer.hit(msg) {
+ 					go p.Send(m) // send hit messages
+@@ -1018,6 +1028,11 @@
+ 	// renderer so we don't need to write the sequence here.
+ 	p.renderer.hideCursor()
+ 
++	// Ask the terminal whether it supports synchronized output. When it does,
++	// the renderer uses it to write screen updates atomically. The reply comes
++	// back as a [ModeReportMsg].
++	p.requestSyncOutput()
++
+ 	// Start the renderer.
+ 	p.startRenderer()
+ 

@@ -1,0 +1,140 @@
+diff --git a/screen_test.go b/screen_test.go
+--- a/screen_test.go
++++ b/screen_test.go
+@@ -14,7 +14,6 @@ type testViewOpts struct {
+ 	mouseMode   MouseMode
+ 	showCursor  bool
+ 	disableBp   bool
+-	disableKe   bool
+ 	keyReleases bool
+ 	bgColor     color.Color
+ }
+@@ -49,6 +48,13 @@ func (m *testViewModel) Update(msg Msg) (Model, Cmd) {
+ func (m *testViewModel) View() View {
+ 	v := m.testModel.View()
+ 	v.AltScreen = m.opts.altScreen
++	v.MouseMode = m.opts.mouseMode
++	v.DisableBracketedPasteMode = m.opts.disableBp
++	v.KeyboardEnhancements.ReportEventTypes = m.opts.keyReleases
++	v.BackgroundColor = m.opts.bgColor
++	if m.opts.showCursor {
++		v.Cursor = NewCursor(0, 0)
++	}
+ 	return v
+ }
+ 
+@@ -112,8 +118,8 @@ func TestViewModel(t *testing.T) {
+ 		{
+ 			name: "kitty_stop_startreleases",
+ 			opts: []testViewOpts{
+-				{disableKe: true},
+-				{disableKe: false, keyReleases: true},
++				{},
++				{keyReleases: true},
+ 			},
+ 		},
+ 		{
+diff --git a/testdata/TestClearMsg/bg_fg_cur_color.golden b/testdata/TestClearMsg/bg_fg_cur_color.golden
+--- a/testdata/TestClearMsg/bg_fg_cur_color.golden
++++ b/testdata/TestClearMsg/bg_fg_cur_color.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h]10;?]11;?]12;?
+\ No newline at end of file
++[?25l[?2004h[=1;1usuccess[J[?25h[?2004l[=0;1u[?2026$p]10;?]11;?]12;?
+\ No newline at end of file
+diff --git a/testdata/TestClearMsg/clear_screen.golden b/testdata/TestClearMsg/clear_screen.golden
+--- a/testdata/TestClearMsg/clear_screen.golden
++++ b/testdata/TestClearMsg/clear_screen.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1u[Jsuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?25l[?2004h[=1;1u[Jsuccess[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestClearMsg/read_set_clipboard.golden b/testdata/TestClearMsg/read_set_clipboard.golden
+--- a/testdata/TestClearMsg/read_set_clipboard.golden
++++ b/testdata/TestClearMsg/read_set_clipboard.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h]52;c;?]52;c;c3VjY2Vzcw==
+\ No newline at end of file
++[?25l[?2004h[=1;1usuccess[J[?25h[?2004l[=0;1u[?2026$p]52;c;?]52;c;c3VjY2Vzcw==
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/altscreen.golden b/testdata/TestViewModel/altscreen.golden
+--- a/testdata/TestViewModel/altscreen.golden
++++ b/testdata/TestViewModel/altscreen.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?25l[?2004h[=1;1usuccess[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/altscreen_autoexit.golden b/testdata/TestViewModel/altscreen_autoexit.golden
+--- a/testdata/TestViewModel/altscreen_autoexit.golden
++++ b/testdata/TestViewModel/altscreen_autoexit.golden
+@@ -1 +1 @@
+-[?25l[?1049h[?2004h[=1;1u[H[2Jsuccess[?25l[?1049l[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?1049h[?25l[?2004h[=1;1u[H[2Jsuccess[?1049l[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/bg_set_color.golden b/testdata/TestViewModel/bg_set_color.golden
+--- a/testdata/TestViewModel/bg_set_color.golden
++++ b/testdata/TestViewModel/bg_set_color.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?25l[?2004h[=1;1u]11;#ffffffsuccess[J[?25h[?2004l]111[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/bp_stop_start.golden b/testdata/TestViewModel/bp_stop_start.golden
+--- a/testdata/TestViewModel/bp_stop_start.golden
++++ b/testdata/TestViewModel/bp_stop_start.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?25l[?2004h[=1;1usuccess[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/cursor_hide.golden b/testdata/TestViewModel/cursor_hide.golden
+--- a/testdata/TestViewModel/cursor_hide.golden
++++ b/testdata/TestViewModel/cursor_hide.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?25l[?2004h[=1;1usuccess[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/cursor_hideshow.golden b/testdata/TestViewModel/cursor_hideshow.golden
+--- a/testdata/TestViewModel/cursor_hideshow.golden
++++ b/testdata/TestViewModel/cursor_hideshow.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?2004h[=1;1u[1 qsuccess[?25h[J[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/kitty_stop_startreleases.golden b/testdata/TestViewModel/kitty_stop_startreleases.golden
+--- a/testdata/TestViewModel/kitty_stop_startreleases.golden
++++ b/testdata/TestViewModel/kitty_stop_startreleases.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?25l[?2004h[=3;1usuccess[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/mouse_allmotion.golden b/testdata/TestViewModel/mouse_allmotion.golden
+--- a/testdata/TestViewModel/mouse_allmotion.golden
++++ b/testdata/TestViewModel/mouse_allmotion.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?25l[?2004h[?1003h[?1006h[=1;1usuccess[J[?25h[?2004l[?1002l[?1003l[?1006l[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/mouse_cellmotion.golden b/testdata/TestViewModel/mouse_cellmotion.golden
+--- a/testdata/TestViewModel/mouse_cellmotion.golden
++++ b/testdata/TestViewModel/mouse_cellmotion.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?25l[?2004h[?1002h[?1006h[=1;1usuccess[J[?25h[?2004l[?1002l[?1003l[?1006l[=0;1u[?2026$p
+\ No newline at end of file
+diff --git a/testdata/TestViewModel/mouse_disable.golden b/testdata/TestViewModel/mouse_disable.golden
+--- a/testdata/TestViewModel/mouse_disable.golden
++++ b/testdata/TestViewModel/mouse_disable.golden
+@@ -1 +1 @@
+-[?25l[?2004h[=1;1usuccess[?25l[J[?25h[?2004l[=0;1u[?25h
+\ No newline at end of file
++[?25l[?2004h[=1;1usuccess[J[?25h[?2004l[=0;1u[?2026$p
+\ No newline at end of file

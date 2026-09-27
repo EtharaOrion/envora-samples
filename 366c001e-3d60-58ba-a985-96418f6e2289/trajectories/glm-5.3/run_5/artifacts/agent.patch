@@ -1,0 +1,95 @@
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/context/context.go ./pkg/distsql/context/context.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/context/context.go	2026-09-24 08:03:15.767050332 +0000
++++ ./pkg/distsql/context/context.go	2026-09-24 12:40:19.000000000 +0000
+@@ -63,17 +63,20 @@
+ 	TiFlashQuerySpillRatio               float64
+ 	TiFlashHashJoinVersion               string
+ 
+-	DistSQLConcurrency            int
+-	ReplicaReadType               kv.ReplicaReadType
+-	WeakConsistency               bool
+-	RCCheckTS                     bool
+-	NotFillCache                  bool
+-	TaskID                        uint64
+-	Priority                      mysql.PriorityEnum
+-	ResourceGroupTagger           *kv.ResourceGroupTagBuilder
+-	EnablePaging                  bool
+-	MinPagingSize                 int
+-	MaxPagingSize                 int
++	DistSQLConcurrency  int
++	ReplicaReadType     kv.ReplicaReadType
++	WeakConsistency     bool
++	RCCheckTS           bool
++	NotFillCache        bool
++	TaskID              uint64
++	Priority            mysql.PriorityEnum
++	ResourceGroupTagger *kv.ResourceGroupTagBuilder
++	EnablePaging        bool
++	MinPagingSize       int
++	MaxPagingSize       int
++	// PagingSizeBytes is the byte-sized paging budget (0 = disabled). It is
++	// forwarded to the coprocessor request as `paging_size_bytes`.
++	PagingSizeBytes               uint64
+ 	RequestSourceType             string
+ 	ExplicitRequestSourceType     string
+ 	StoreBatchSize                int
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/request_builder.go ./pkg/distsql/request_builder.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/request_builder.go	2026-09-24 08:03:15.767050332 +0000
++++ ./pkg/distsql/request_builder.go	2026-09-24 12:05:25.000000000 +0000
+@@ -363,6 +363,7 @@
+ 		builder.SetPaging(dctx.EnablePaging)
+ 		builder.Request.Paging.MinPagingSize = uint64(dctx.MinPagingSize)
+ 		builder.Request.Paging.MaxPagingSize = uint64(dctx.MaxPagingSize)
++		builder.Request.Paging.PagingSizeBytes = dctx.PagingSizeBytes
+ 	}
+ 	builder.RequestSource.RequestSourceInternal = dctx.InRestrictedSQL
+ 	builder.RequestSource.RequestSourceType = dctx.RequestSourceType
+diff -ruN /opt/pristine/workspace/tidb/pkg/kv/kv.go ./pkg/kv/kv.go
+--- /opt/pristine/workspace/tidb/pkg/kv/kv.go	2026-09-24 08:03:15.835470564 +0000
++++ ./pkg/kv/kv.go	2026-09-24 12:05:18.000000000 +0000
+@@ -637,6 +637,9 @@
+ 		// when enabled, this field is adjusted to be max(MaxPagingSize, paging.MinAllowedMaxPagingSize),
+ 		// see paging.GrowPagingSize
+ 		MaxPagingSize uint64
++		// PagingSizeBytes is used when Paging is true. 0 means the byte budget is
++		// disabled, otherwise it bounds the encoded byte size of a single page.
++		PagingSizeBytes uint64
+ 	}
+ 	// RequestSource indicates whether the request is an internal request.
+ 	RequestSource util.RequestSource
+diff -ruN /opt/pristine/workspace/tidb/pkg/session/session.go ./pkg/session/session.go
+--- /opt/pristine/workspace/tidb/pkg/session/session.go	2026-09-24 08:03:15.939653205 +0000
++++ ./pkg/session/session.go	2026-09-24 12:38:23.000000000 +0000
+@@ -3507,6 +3507,7 @@
+ 			EnablePaging:                  vars.EnablePaging,
+ 			MinPagingSize:                 vars.MinPagingSize,
+ 			MaxPagingSize:                 vars.MaxPagingSize,
++			PagingSizeBytes:               vars.PagingSizeBytes,
+ 			RequestSourceType:             vars.RequestSourceType,
+ 			ExplicitRequestSourceType:     vars.ExplicitRequestSourceType,
+ 			StoreBatchSize:                vars.StoreBatchSize,
+diff -ruN /opt/pristine/workspace/tidb/pkg/sessionctx/variable/session.go ./pkg/sessionctx/variable/session.go
+--- /opt/pristine/workspace/tidb/pkg/sessionctx/variable/session.go	2026-09-24 08:03:15.945251418 +0000
++++ ./pkg/sessionctx/variable/session.go	2026-09-24 12:38:23.000000000 +0000
+@@ -1552,7 +1552,9 @@
+ 
+ 	// EnablePaging indicates whether enable paging in coprocessor requests.
+ 	EnablePaging bool
+-
++	// PagingSizeBytes is the byte-sized paging budget for coprocessor requests
++	// (kvproto coprocessor.Request.paging_size_bytes). 0 means disabled.
++	PagingSizeBytes uint64
+ 	// EnableLegacyInstanceScope says if SET SESSION can be used to set an instance
+ 	// scope variable. The default is TRUE.
+ 	EnableLegacyInstanceScope bool
+diff -ruN /opt/pristine/workspace/tidb/pkg/store/copr/coprocessor.go ./pkg/store/copr/coprocessor.go
+--- /opt/pristine/workspace/tidb/pkg/store/copr/coprocessor.go	2026-09-24 08:03:15.959360297 +0000
++++ ./pkg/store/copr/coprocessor.go	2026-09-24 12:39:58.000000000 +0000
+@@ -1727,6 +1727,7 @@
+ 		Ranges:          task.ranges.ToPBRanges(),
+ 		SchemaVer:       worker.req.SchemaVar,
+ 		PagingSize:      task.pagingSize,
++		PagingSizeBytes: worker.req.Paging.PagingSizeBytes,
+ 		MaxKeysRead:     taskMaxKeysRead,
+ 		Tasks:           task.ToPBBatchTasks(),
+ 		ConnectionId:    worker.req.ConnID,

@@ -1,0 +1,166 @@
+{
+  "id": "03d88516-940c-4276-adec-5ffa5e3376d7",
+  "task_name": "ethara/envora-pd-keyspace-error",
+  "trial_name": "954943fb-3f55-54c4-8f36-1d72defc__JAHnHdC",
+  "trial_uri": "file:///home/ec2-user/Harness/envora-harness-1/output/2026-09-24__11-57-03/954943fb-3f55-54c4-8f36-1d72defc__JAHnHdC",
+  "task_id": {
+    "path": "/tmp/harbor_task.7klz6m5s/954943fb-3f55-54c4-8f36-1d72defcce86"
+  },
+  "source": null,
+  "task_checksum": "a8a463c08ebc3caa93aae564b60061fe3ed4b00ec2d9bbcd2cd07bad8d522e93",
+  "config": {
+    "task": {
+      "path": "/tmp/harbor_task.7klz6m5s/954943fb-3f55-54c4-8f36-1d72defcce86",
+      "git_url": null,
+      "git_commit_id": null,
+      "name": null,
+      "ref": null,
+      "overwrite": false,
+      "download_dir": null,
+      "source": null
+    },
+    "trial_name": "954943fb-3f55-54c4-8f36-1d72defc__JAHnHdC",
+    "trials_dir": "/home/ec2-user/Harness/envora-harness-1/output/2026-09-24__11-57-03",
+    "install_only": false,
+    "timeout_multiplier": 1.0,
+    "agent_timeout_multiplier": null,
+    "verifier_timeout_multiplier": null,
+    "agent_setup_timeout_multiplier": null,
+    "environment_build_timeout_multiplier": 4.0,
+    "agent": {
+      "name": "crossrepo_harness.adapters.prebaked_openhands:PrebakedOpenHands",
+      "import_path": null,
+      "model_name": "anthropic/glm-5.3",
+      "n_concurrent": null,
+      "concurrency_group": null,
+      "skills": [],
+      "override_timeout_sec": null,
+      "override_setup_timeout_sec": null,
+      "max_timeout_sec": null,
+      "resume_trajectory": false,
+      "load_trajectory": null,
+      "extra_allowed_hosts": [
+        "glm-bridge-internal"
+      ],
+      "kwargs": {},
+      "env": {
+        "LLM_BASE_URL": "http://glm-bridge-internal:8766",
+        "LLM_API_KEY": "envo****tub",
+        "LLM_DROP_PARAMS": "true"
+      },
+      "mcp_servers": []
+    },
+    "user_agent": null,
+    "environment": {
+      "type": "docker",
+      "import_path": null,
+      "force_build": false,
+      "delete": false,
+      "cpu_enforcement_policy": "auto",
+      "memory_enforcement_policy": "auto",
+      "override_cpus": null,
+      "override_memory_mb": null,
+      "override_storage_mb": null,
+      "override_gpus": null,
+      "override_tpu": null,
+      "mounts": null,
+      "extra_docker_compose": [],
+      "kwargs": {},
+      "extra_allowed_hosts": []
+    },
+    "verifier": {
+      "override_timeout_sec": null,
+      "max_timeout_sec": null,
+      "disable": false
+    },
+    "artifacts": [],
+    "extra_instruction_paths": [],
+    "extra_instructions": [],
+    "job_id": "f0277bff-8967-47ae-b2bc-c15994737d4b",
+    "source_trial": null
+  },
+  "agent_info": {
+    "name": "openhands",
+    "version": "/opt/openhands-venv/lib/python3.13/site-packages/google/auth/transport/grpc.py:44: FutureWarning: grpcio < 1.83.0 does not support Post-Quantum Cryptography (PQC). Support for non-PQC environments is deprecated. In October 2026, google-auth will raise its minimum requirements to enforce grpcio >= 1.83.0. For more details on Google Cloud's post-quantum security migration, visit: https://cloud.google.com/security/resources/post-quantum-cryptography\n  warnings.warn(\nOpenHands version: 1.6.0",
+    "model_info": {
+      "name": "glm-5.3",
+      "provider": "anthropic"
+    }
+  },
+  "agent_result": {
+    "n_input_tokens": 6782126,
+    "n_cache_tokens": 6707328,
+    "n_output_tokens": 28930,
+    "cost_usd": 1.975914,
+    "model_usage": null,
+    "rollout_details": null,
+    "metadata": null
+  },
+  "verifier_result": {
+    "rewards": {
+      "reward": 1.0,
+      "outcome": 1.0,
+      "constraints": 1.0,
+      "resolved": 1,
+      "all_f2p_green": 1,
+      "all_p2p_green": 1,
+      "reference_ok": 1,
+      "tamper": 0
+    },
+    "scores": {
+      "score_outcome": 1.0,
+      "score_deterministic": 1.0,
+      "score_rubric": 0.77,
+      "score_process": 0.885,
+      "score_eval": 0.9885,
+      "score_rl": 0.95
+    },
+    "assay": {
+      "alpha": 0.05,
+      "gate": 1,
+      "stratum_size": 1,
+      "status": "scored",
+      "verifier_mode": "separate",
+      "verifier_trusted": true
+    }
+  },
+  "verifier_environment_mode": "separate",
+  "exception_info": null,
+  "started_at": "2026-09-24T11:57:04.438798Z",
+  "finished_at": "2026-09-24T12:23:37.006941Z",
+  "environment_setup": {
+    "started_at": "2026-09-24T11:57:04.490773Z",
+    "finished_at": "2026-09-24T11:57:10.173031Z"
+  },
+  "agent_setup": {
+    "started_at": "2026-09-24T11:57:10.173079Z",
+    "finished_at": "2026-09-24T11:57:19.081209Z"
+  },
+  "agent_execution": {
+    "started_at": "2026-09-24T11:57:19.081361Z",
+    "finished_at": "2026-09-24T12:19:27.955358Z"
+  },
+  "verifier": {
+    "started_at": "2026-09-24T12:21:33.339722Z",
+    "finished_at": "2026-09-24T12:23:37.006927Z"
+  },
+  "step_results": null,
+  "sample_layout": {
+    "emitted_as": "glm-5-3-run-repl2-jahnhdc",
+    "graded_as": "glm-5-3-run-repl2-jahnhdc"
+  },
+  "score_outcome": 1.0,
+  "score_deterministic": 1.0,
+  "score_rubric": 0.77,
+  "score_process": 0.885,
+  "score_eval": 0.9885,
+  "score_rl": 0.95,
+  "assay": {
+    "alpha": 0.05,
+    "gate": 1,
+    "stratum_size": 1,
+    "status": "scored",
+    "verifier_mode": "separate",
+    "verifier_trusted": true
+  }
+}

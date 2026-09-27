@@ -1,0 +1,197 @@
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/context/context.go ./pkg/distsql/context/context.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/context/context.go	2026-09-24 08:03:15.767050332 +0000
++++ ./pkg/distsql/context/context.go	2026-09-24 13:49:04.000000000 +0000
+@@ -88,6 +88,9 @@
+ 	// copIterator to enforce a statement-wide max_keys_read budget across all
+ 	// coprocessor iterators belonging to the same statement. nil when MaxKeysRead == 0.
+ 	MaxKeysReadCounter *atomic.Uint64
++	// PagingSizeBytes is the byte-sized paging budget used by the coprocessor
++	// paging protocol, 0 when it is disabled.
++	PagingSizeBytes uint64
+ 
+ 	ReplicaClosestReadThreshold int64
+ 	ConnectionID                uint64
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/context/context_test.go ./pkg/distsql/context/context_test.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/context/context_test.go	2026-09-24 08:03:15.767050332 +0000
++++ ./pkg/distsql/context/context_test.go	2026-09-24 13:56:24.000000000 +0000
+@@ -91,6 +91,7 @@
+ 		MaxExecutionTime:              1,
+ 		MaxKeysRead:                   1,
+ 		MaxKeysReadCounter:            new(atomic.Uint64),
++		PagingSizeBytes:               1,
+ 
+ 		ReplicaClosestReadThreshold: 1,
+ 		ConnectionID:                1,
+diff -ruN /opt/pristine/workspace/tidb/pkg/distsql/request_builder.go ./pkg/distsql/request_builder.go
+--- /opt/pristine/workspace/tidb/pkg/distsql/request_builder.go	2026-09-24 08:03:15.767050332 +0000
++++ ./pkg/distsql/request_builder.go	2026-09-24 14:13:28.000000000 +0000
+@@ -363,6 +363,7 @@
+ 		builder.SetPaging(dctx.EnablePaging)
+ 		builder.Request.Paging.MinPagingSize = uint64(dctx.MinPagingSize)
+ 		builder.Request.Paging.MaxPagingSize = uint64(dctx.MaxPagingSize)
++		builder.Request.Paging.PagingSizeBytes = dctx.PagingSizeBytes
+ 	}
+ 	builder.RequestSource.RequestSourceInternal = dctx.InRestrictedSQL
+ 	builder.RequestSource.RequestSourceType = dctx.RequestSourceType
+diff -ruN /opt/pristine/workspace/tidb/pkg/kv/kv.go ./pkg/kv/kv.go
+--- /opt/pristine/workspace/tidb/pkg/kv/kv.go	2026-09-24 08:03:15.835470564 +0000
++++ ./pkg/kv/kv.go	2026-09-24 13:49:00.000000000 +0000
+@@ -637,6 +637,10 @@
+ 		// when enabled, this field is adjusted to be max(MaxPagingSize, paging.MinAllowedMaxPagingSize),
+ 		// see paging.GrowPagingSize
+ 		MaxPagingSize uint64
++		// PagingSizeBytes is the byte-sized paging budget, 0 when it is disabled.
++		// It bounds the encoded size of a single page independently of the
++		// row-count-based paging size above.
++		PagingSizeBytes uint64
+ 	}
+ 	// RequestSource indicates whether the request is an internal request.
+ 	RequestSource util.RequestSource
+diff -ruN /opt/pristine/workspace/tidb/pkg/session/session.go ./pkg/session/session.go
+--- /opt/pristine/workspace/tidb/pkg/session/session.go	2026-09-24 08:03:15.939653205 +0000
++++ ./pkg/session/session.go	2026-09-24 14:13:29.000000000 +0000
+@@ -3517,6 +3517,7 @@
+ 			TiKVClientReadTimeout:         vars.GetTiKVClientReadTimeout(),
+ 			MaxExecutionTime:              vars.GetMaxExecutionTime(),
+ 			MaxKeysRead:                   vars.GetMaxKeysRead(),
++			PagingSizeBytes:               vars.PagingSizeBytes,
+ 
+ 			ReplicaClosestReadThreshold: vars.ReplicaClosestReadThreshold,
+ 			ConnectionID:                vars.ConnectionID,
+diff -ruN /opt/pristine/workspace/tidb/pkg/sessionctx/vardef/sysvar.go ./pkg/sessionctx/vardef/sysvar.go
+--- /opt/pristine/workspace/tidb/pkg/sessionctx/vardef/sysvar.go	2026-09-24 08:03:15.944680958 +0000
++++ ./pkg/sessionctx/vardef/sysvar.go	2026-09-24 13:52:39.000000000 +0000
+@@ -310,6 +310,8 @@
+ 	MaxExecutionTime = "max_execution_time"
+ 	// TiDBMaxKeysRead is the name of the 'tidb_max_keys_read' system variable.
+ 	TiDBMaxKeysRead = "tidb_max_keys_read"
++	// TiDBPagingSizeBytes is the name of the 'tidb_paging_size_bytes' system variable.
++	TiDBPagingSizeBytes = "tidb_paging_size_bytes"
+ 	// TiKVClientReadTimeout is the name of the 'tikv_client_read_timeout' system variable.
+ 	TiKVClientReadTimeout = "tikv_client_read_timeout"
+ 	// TiDBLoadBindingTimeout is the name of the 'tidb_load_binding_timeout' system variable.
+diff -ruN /opt/pristine/workspace/tidb/pkg/sessionctx/variable/session.go ./pkg/sessionctx/variable/session.go
+--- /opt/pristine/workspace/tidb/pkg/sessionctx/variable/session.go	2026-09-24 08:03:15.945251418 +0000
++++ ./pkg/sessionctx/variable/session.go	2026-09-24 14:13:29.000000000 +0000
+@@ -1311,6 +1311,10 @@
+ 	// may examine. 0 means unlimited. Only applies to SELECT statements.
+ 	MaxKeysRead uint64
+ 
++	// PagingSizeBytes is the byte-sized paging budget of the coprocessor paging
++	// protocol, bounding the encoded size of a single page. 0 means disabled.
++	PagingSizeBytes uint64
++
+ 	// KeysExamined is the cumulative number of storage engine keys examined across all
+ 	// statements (SELECT, UPDATE, DELETE, etc.) in this session. Reset by FLUSH STATUS.
+ 	KeysExamined uint64
+diff -ruN /opt/pristine/workspace/tidb/pkg/sessionctx/variable/sysvar.go ./pkg/sessionctx/variable/sysvar.go
+--- /opt/pristine/workspace/tidb/pkg/sessionctx/variable/sysvar.go	2026-09-24 08:03:15.945251418 +0000
++++ ./pkg/sessionctx/variable/sysvar.go	2026-09-24 13:52:54.000000000 +0000
+@@ -1965,6 +1965,18 @@
+ 		}},
+ 	{
+ 		Scope:                   vardef.ScopeGlobal | vardef.ScopeSession,
++		Name:                    vardef.TiDBPagingSizeBytes,
++		Value:                   "0",
++		Type:                    vardef.TypeUnsigned,
++		MinValue:                0,
++		MaxValue:                math.MaxUint64,
++		IsHintUpdatableVerified: true,
++		SetSession: func(s *SessionVars, val string) error {
++			s.PagingSizeBytes = TidbOptUint64(val, 0)
++			return nil
++		}},
++	{
++		Scope:                   vardef.ScopeGlobal | vardef.ScopeSession,
+ 		Name:                    vardef.TiKVClientReadTimeout,
+ 		Value:                   "0",
+ 		Type:                    vardef.TypeUnsigned,
+diff -ruN /opt/pristine/workspace/tidb/pkg/store/copr/copr_test/coprocessor_test.go ./pkg/store/copr/copr_test/coprocessor_test.go
+--- /opt/pristine/workspace/tidb/pkg/store/copr/copr_test/coprocessor_test.go	2026-09-24 08:03:15.959360297 +0000
++++ ./pkg/store/copr/copr_test/coprocessor_test.go	2026-09-24 14:04:45.000000000 +0000
+@@ -242,9 +242,10 @@
+ 		Concurrency:    15,
+ 		StoreBatchSize: 3,
+ 		Paging: struct {
+-			Enable        bool
+-			MinPagingSize uint64
+-			MaxPagingSize uint64
++			Enable          bool
++			MinPagingSize   uint64
++			MaxPagingSize   uint64
++			PagingSizeBytes uint64
+ 		}{
+ 			Enable:        true,
+ 			MinPagingSize: 1,
+diff -ruN /opt/pristine/workspace/tidb/pkg/store/copr/coprocessor.go ./pkg/store/copr/coprocessor.go
+--- /opt/pristine/workspace/tidb/pkg/store/copr/coprocessor.go	2026-09-24 08:03:15.959360297 +0000
++++ ./pkg/store/copr/coprocessor.go	2026-09-24 14:13:30.000000000 +0000
+@@ -290,10 +290,12 @@
+ 	cmdType   tikvrpc.CmdType
+ 	storeType kv.StoreType
+ 
+-	eventCb       trxevents.EventCallback
+-	paging        bool
+-	pagingSize    uint64
+-	pagingTaskIdx uint32
++	eventCb    trxevents.EventCallback
++	paging     bool
++	pagingSize uint64
++	// pagingSizeBytes is the byte-sized paging budget, 0 when it is disabled.
++	pagingSizeBytes uint64
++	pagingTaskIdx   uint32
+ 
+ 	partitionIndex int64 // used by balanceBatchCopTask in PartitionTableScan
+ 	requestSource  util.RequestSource
+@@ -661,6 +663,11 @@
+ 		if req.Paging.Enable {
+ 			pagingSize = req.Paging.MinPagingSize
+ 		}
++		// The byte-sized paging budget is per-page, it doesn't grow with rounds.
++		pagingSizeBytes := uint64(0)
++		if req.Paging.Enable {
++			pagingSizeBytes = req.Paging.PagingSizeBytes
++		}
+ 		for i := 0; i < rLen; {
+ 			nextI := min(i+rangesPerTaskLimit, rLen)
+ 			hint := -1
+@@ -694,6 +701,7 @@
+ 				eventCb:           eventCb,
+ 				paging:            req.Paging.Enable,
+ 				pagingSize:        pagingSize,
++				pagingSizeBytes:   pagingSizeBytes,
+ 				requestSource:     req.RequestSource,
+ 				RowCountHint:      hint,
+ 				busyThreshold:     req.StoreBusyThreshold,
+@@ -721,6 +729,7 @@
+ 					// disable paging for small limit.
+ 					task.paging = false
+ 					task.pagingSize = 0
++					task.pagingSizeBytes = 0
+ 				} else {
+ 					pagingSize = paging.GrowPagingSize(pagingSize, req.Paging.MaxPagingSize)
+ 				}
+@@ -848,6 +857,7 @@
+ 			// disable paging for batched task.
+ 			b.tasks[idx].paging = false
+ 			b.tasks[idx].pagingSize = 0
++			b.tasks[idx].pagingSizeBytes = 0
+ 			// The task and it's batched can be served only in the store we chose.
+ 			// If the task is redirected to other replica, the batched task may not meet region-miss or store-not-match error.
+ 			// So disable busy threshold for the task which carries batched tasks.
+@@ -858,6 +868,7 @@
+ 		}
+ 		batchedTask.task.paging = false
+ 		batchedTask.task.pagingSize = 0
++		batchedTask.task.pagingSizeBytes = 0
+ 		batchedTask.task.busyThreshold = 0
+ 		b.tasks[idx].batchTaskList[task.taskID] = batchedTask
+ 	}
+@@ -1727,6 +1738,7 @@
+ 		Ranges:          task.ranges.ToPBRanges(),
+ 		SchemaVer:       worker.req.SchemaVar,
+ 		PagingSize:      task.pagingSize,
++		PagingSizeBytes: task.pagingSizeBytes,
+ 		MaxKeysRead:     taskMaxKeysRead,
+ 		Tasks:           task.ToPBBatchTasks(),
+ 		ConnectionId:    worker.req.ConnID,

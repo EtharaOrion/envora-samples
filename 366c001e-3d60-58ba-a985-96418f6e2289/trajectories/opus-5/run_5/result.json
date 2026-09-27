@@ -1,0 +1,166 @@
+{
+  "id": "d8b07275-39b4-4031-bb55-4084a454a95c",
+  "task_name": "ethara/envora-tidb-session-variable",
+  "trial_name": "366c001e-3d60-58ba-a985-96418f6e__tUtkp2x",
+  "trial_uri": "file:///home/ec2-user/pass8-opus5/slots/5/jobs/2026-09-24__12-47-08/366c001e-3d60-58ba-a985-96418f6e__tUtkp2x",
+  "task_id": {
+    "path": "/tmp/harbor_task.vgbvnxrd/366c001e-3d60-58ba-a985-96418f6e2289"
+  },
+  "source": null,
+  "task_checksum": "630310f987476c977edde4345f588bab1e0d87749f515092a0b708ca64ceda7d",
+  "config": {
+    "task": {
+      "path": "/tmp/harbor_task.vgbvnxrd/366c001e-3d60-58ba-a985-96418f6e2289",
+      "git_url": null,
+      "git_commit_id": null,
+      "name": null,
+      "ref": null,
+      "overwrite": false,
+      "download_dir": null,
+      "source": null
+    },
+    "trial_name": "366c001e-3d60-58ba-a985-96418f6e__tUtkp2x",
+    "trials_dir": "/home/ec2-user/pass8-opus5/slots/5/jobs/2026-09-24__12-47-08",
+    "install_only": false,
+    "timeout_multiplier": 1.0,
+    "agent_timeout_multiplier": 3.0,
+    "verifier_timeout_multiplier": null,
+    "agent_setup_timeout_multiplier": null,
+    "environment_build_timeout_multiplier": 4.0,
+    "agent": {
+      "name": "crossrepo_harness.adapters.prebaked_openhands:PrebakedOpenHands",
+      "import_path": null,
+      "model_name": "anthropic/claude-opus-5",
+      "n_concurrent": null,
+      "concurrency_group": null,
+      "skills": [],
+      "override_timeout_sec": null,
+      "override_setup_timeout_sec": null,
+      "max_timeout_sec": null,
+      "resume_trajectory": false,
+      "load_trajectory": null,
+      "extra_allowed_hosts": [],
+      "kwargs": {},
+      "env": {
+        "LLM_BASE_URL": "http://10.99.2.1:8765",
+        "LLM_API_KEY": "kaij****tub",
+        "LLM_DROP_PARAMS": "true"
+      },
+      "mcp_servers": []
+    },
+    "user_agent": null,
+    "environment": {
+      "type": "docker",
+      "import_path": null,
+      "force_build": false,
+      "delete": false,
+      "cpu_enforcement_policy": "auto",
+      "memory_enforcement_policy": "auto",
+      "override_cpus": null,
+      "override_memory_mb": null,
+      "override_storage_mb": null,
+      "override_gpus": null,
+      "override_tpu": null,
+      "mounts": null,
+      "extra_docker_compose": [
+        "/home/ec2-user/pass8-opus5/seal.yaml"
+      ],
+      "kwargs": {},
+      "extra_allowed_hosts": []
+    },
+    "verifier": {
+      "override_timeout_sec": null,
+      "max_timeout_sec": null,
+      "disable": false
+    },
+    "artifacts": [],
+    "extra_instruction_paths": [],
+    "extra_instructions": [],
+    "job_id": "619bb0e8-05fa-4188-b2e0-368d59e04222",
+    "source_trial": null
+  },
+  "agent_info": {
+    "name": "openhands",
+    "version": "/opt/openhands-venv/lib/python3.13/site-packages/google/auth/transport/grpc.py:44: FutureWarning: grpcio < 1.83.0 does not support Post-Quantum Cryptography (PQC). Support for non-PQC environments is deprecated. In October 2026, google-auth will raise its minimum requirements to enforce grpcio >= 1.83.0. For more details on Google Cloud's post-quantum security migration, visit: https://cloud.google.com/security/resources/post-quantum-cryptography\n  warnings.warn(\nOpenHands version: 1.6.0",
+    "model_info": {
+      "name": "claude-opus-5",
+      "provider": "anthropic"
+    }
+  },
+  "agent_result": {
+    "n_input_tokens": 6192770,
+    "n_cache_tokens": 6014301,
+    "n_output_tokens": 208550,
+    "cost_usd": 9.113245,
+    "model_usage": null,
+    "rollout_details": null,
+    "metadata": null
+  },
+  "verifier_result": {
+    "rewards": {
+      "reward": 0.3333333333333333,
+      "outcome": 0.0,
+      "constraints": 1.0,
+      "resolved": 0,
+      "all_f2p_green": 0,
+      "all_p2p_green": 1,
+      "reference_ok": 0,
+      "tamper": 0
+    },
+    "scores": {
+      "score_outcome": 0.33,
+      "score_deterministic": 0.9444,
+      "score_rubric": 0.8261,
+      "score_process": 0.8853,
+      "score_eval": 0.3885,
+      "score_rl": 0.35
+    },
+    "assay": {
+      "alpha": 0.05,
+      "gate": 1,
+      "stratum_size": 1,
+      "status": "scored",
+      "verifier_mode": "separate",
+      "verifier_trusted": true
+    }
+  },
+  "verifier_environment_mode": "separate",
+  "exception_info": null,
+  "started_at": "2026-09-24T12:47:08.826651Z",
+  "finished_at": "2026-09-24T14:10:26.447338Z",
+  "environment_setup": {
+    "started_at": "2026-09-24T12:47:08.848457Z",
+    "finished_at": "2026-09-24T12:47:09.983056Z"
+  },
+  "agent_setup": {
+    "started_at": "2026-09-24T12:47:09.983101Z",
+    "finished_at": "2026-09-24T12:47:18.735793Z"
+  },
+  "agent_execution": {
+    "started_at": "2026-09-24T12:47:18.735931Z",
+    "finished_at": "2026-09-24T14:08:37.563403Z"
+  },
+  "verifier": {
+    "started_at": "2026-09-24T14:09:02.847300Z",
+    "finished_at": "2026-09-24T14:10:26.447323Z"
+  },
+  "step_results": null,
+  "sample_layout": {
+    "emitted_as": "opus-5-run-p8s5t124708-tutkp2x",
+    "graded_as": "366c001e-3d60-58ba-a985-96418f6e__tUtkp2x"
+  },
+  "score_outcome": 0.33,
+  "score_deterministic": 0.9444,
+  "score_rubric": 0.8261,
+  "score_process": 0.8853,
+  "score_eval": 0.3885,
+  "score_rl": 0.35,
+  "assay": {
+    "alpha": 0.05,
+    "gate": 1,
+    "stratum_size": 1,
+    "status": "scored",
+    "verifier_mode": "separate",
+    "verifier_trusted": true
+  }
+}
