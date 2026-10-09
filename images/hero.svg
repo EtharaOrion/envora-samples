@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">envora - Boundary Weaver</title>
+  <desc id="desc">A goddess joins floating repository islands with luminous interface threads. Her attendants are the ENGRAM memory lantern, the FORGE hammer, and the CRUCIBLE audit mirror. Reason across repositories. Respect every boundary.</desc>
+  <metadata>Original code-native artwork for envora. Human-elected mascot: Boundary Weaver. ENGRAM: memory lantern. FORGE: forge hammer. CRUCIBLE: audit mirror. Preserve until human re-election.</metadata>
+  <defs>
+    <linearGradient id="night" x2=".8" y2="1"><stop stop-color="#07111d"/><stop offset=".48" stop-color="#112a36"/><stop offset="1" stop-color="#050c18"/></linearGradient>
+    <radialGradient id="aurora"><stop stop-color="#88d4c3" stop-opacity=".34"/><stop offset=".45" stop-color="#65a9b7" stop-opacity=".12"/><stop offset="1" stop-color="#07111d" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lamp"><stop stop-color="#fff5d1"/><stop offset=".16" stop-color="#eec787" stop-opacity=".85"/><stop offset=".5" stop-color="#d8a66b" stop-opacity=".18"/><stop offset="1" stop-color="#d8a66b" stop-opacity="0"/></radialGradient>
+    <linearGradient id="stone" x2=".7" y2="1"><stop stop-color="#487079"/><stop offset=".36" stop-color="#213d4d"/><stop offset="1" stop-color="#091523"/></linearGradient>
+    <linearGradient id="top" x2="1" y2=".7"><stop stop-color="#567d81"/><stop offset="1" stop-color="#18303c"/></linearGradient>
+    <linearGradient id="gold" x2="1" y2="1"><stop stop-color="#fff0c2"/><stop offset=".3" stop-color="#c9a570"/><stop offset=".65" stop-color="#806243"/><stop offset="1" stop-color="#e8ca90"/></linearGradient>
+    <linearGradient id="skin" x2="1" y2=".5"><stop stop-color="#f4d5ad"/><stop offset=".55" stop-color="#b68b78"/><stop offset="1" stop-color="#66596a"/></linearGradient>
+    <linearGradient id="robe" x2="1" y2=".8"><stop stop-color="#93c8c0"/><stop offset=".26" stop-color="#4b8187"/><stop offset=".56" stop-color="#244755"/><stop offset=".8" stop-color="#1d334a"/><stop offset="1" stop-color="#587b83"/></linearGradient>
+    <linearGradient id="veil" x2=".8" y2="1"><stop stop-color="#a8dad0" stop-opacity=".64"/><stop offset="1" stop-color="#24495a" stop-opacity=".08"/></linearGradient>
+    <linearGradient id="mirror" x2="1" y2="1"><stop stop-color="#eff7df"/><stop offset=".25" stop-color="#8cb8b7"/><stop offset=".55" stop-color="#253e55"/><stop offset="1" stop-color="#729f9f"/></linearGradient>
+    <linearGradient id="fade" x2="0" y2="1"><stop stop-color="#050c18" stop-opacity="0"/><stop offset="1" stop-color="#050c18"/></linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="25"/></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="3"/></filter>
+    <g id="island">
+      <path d="M-180 0 -142 57 -85 72 -46 156 -12 127 22 179 63 98 104 106 148 45 180 0Z" fill="url(#stone)"/>
+      <path d="M-180 0 -93-34 51-41 180 0 103 34 -50 43Z" fill="url(#top)" stroke="#83b6ab" stroke-opacity=".45"/>
+      <path d="M-142 20 -121 60 -95 67 -74 101M-56 37 -46 121 -25 89M25 39 22 148M93 26 79 89 104 73M142 15 119 62" fill="none" stroke="#648189" stroke-opacity=".45" stroke-width="2"/>
+      <path d="M-115-6 -115-53 -63-72 -63-21Z" fill="#2d525e"/>
+      <path d="M-63-72 -11-49 -11-2 -63-21Z" fill="#18333f"/>
+      <path d="M-115-53 -63-72 -11-49 -64-32Z" fill="#86aaa0"/>
+      <path d="M15 7 15-81 67-99 67-11Z" fill="#365b64"/>
+      <path d="M67-99 111-77 111 4 67-11Z" fill="#142b38"/>
+      <path d="M15-81 67-99 111-77 58-59Z" fill="#9cb8a5"/>
+      <g stroke="#c7d7b8" stroke-width="2" opacity=".5"><path d="M-103-41 -79-49M-103-30 -79-38M-103-19 -79-27M29-65 53-73M29-51 53-59M29-37 53-45M29-23 53-31"/></g>
+      <path d="M-164 4 -50 34 99 25 156 4" fill="none" stroke="#d4bd8e" stroke-width="2" stroke-dasharray="2 7"/>
+      <ellipse cx="-145" cy="0" rx="8" ry="4" fill="#e2d0a2"/><ellipse cx="137" cy="6" rx="8" ry="4" fill="#e2d0a2"/>
+    </g>
+  </defs>
+  <path fill="url(#night)" d="M0 0H1600V900H0Z"/>
+  <ellipse cx="971" cy="291" rx="650" ry="530" fill="url(#aurora)"/>
+  <path d="M-60 608C235 203 612 363 964 122S1420 144 1650-100" stroke="#6bb3b4" stroke-opacity=".06" stroke-width="110" fill="none" filter="url(#soft)"/>
+  <path d="M864-100 438 729 1187 639 1278-100Z" fill="url(#veil)" opacity=".08"/>
+  <g fill="#b7d2c6" opacity=".5"><circle cx="190" cy="151" r="1.4"/><circle cx="469" cy="121" r="1"/><circle cx="743" cy="91" r="1.6"/><circle cx="1197" cy="89" r="1.2"/><circle cx="1440" cy="189" r="1.2"/><circle cx="1344" cy="74" r="1"/><circle cx="119" cy="395" r="1"/><circle cx="586" cy="183" r="1"/><circle cx="1510" cy="450" r="1.8"/><circle cx="1028" cy="145" r="1"/><circle cx="370" cy="227" r="1.6"/><circle cx="1290" cy="341" r="1.3"/></g>
+  <!-- Distant repositories occupy separate planes; the illuminated rim is the interface. -->
+  <g opacity=".25" transform="translate(1470 339) scale(.6)"><use href="#island"/></g>
+  <g opacity=".22" transform="translate(592 275) scale(.45)"><use href="#island"/></g>
+  <g opacity=".5" transform="translate(1202 354) scale(.64)"><use href="#island"/></g>
+  <path d="M130 629Q549 507 915 619T1610 570" fill="none" stroke="#9ec5c1" stroke-opacity=".09" stroke-width="43" filter="url(#soft)"/>
+  <g transform="translate(505 558) scale(.93)"><use href="#island"/></g>
+  <g transform="translate(1360 618) scale(1.05)"><use href="#island"/></g>
+  <!-- Halo, hair and the wind-borne mantle behind the Weaver. -->
+  <g fill="none" stroke="url(#gold)"><circle cx="909" cy="300" r="109" stroke-width="1" opacity=".54"/><circle cx="909" cy="300" r="97" stroke-width=".6" opacity=".45"/><path d="M797 300H773M1021 300H1045M909 188V166M836 223 823 210M982 223 995 210" opacity=".7"/></g>
+  <path d="M875 257C829 272 840 351 806 383S758 421 783 469C804 443 827 448 855 426L972 418C1005 404 1019 441 1056 412C998 412 1008 363 975 336C981 291 950 236 915 241Z" fill="#0b1c2b"/>
+  <path d="M857 344C755 338 752 485 633 490C730 509 797 434 812 389C780 540 696 589 651 635C795 606 842 523 869 399L952 386C976 518 1085 580 1204 546C1111 529 1030 429 965 348Z" fill="url(#veil)"/>
+  <path d="M859 360C789 378 816 465 682 537M975 393C1036 465 1084 510 1161 535" fill="none" stroke="#b7d3bc" opacity=".28" stroke-width="2"/>
+  <!-- Body and drapery: directional highlights track the lantern at upper left. -->
+  <path d="M878 354C858 370 857 420 862 455C852 523 807 633 752 721C830 752 928 754 1025 714C969 640 947 531 948 457C969 414 961 372 939 354Z" fill="url(#robe)"/>
+  <path d="M879 405C896 482 832 627 793 718C822 675 905 562 906 440M921 431C903 530 925 681 969 727C945 628 948 559 932 476M860 513C850 602 823 674 811 712M886 517C863 655 882 696 867 734" fill="none" stroke="#aac6b6" stroke-opacity=".32" stroke-width="3"/>
+  <path d="M891 465C922 536 885 665 909 739L951 731C914 659 938 580 929 486Z" fill="#112d40" opacity=".64"/>
+  <path d="M859 440Q906 458 951 437L948 454Q905 479 861 457Z" fill="url(#gold)"/>
+  <path d="M899 459 895 548 909 559 919 546 913 460" fill="none" stroke="url(#gold)" stroke-width="2"/>
+  <path d="M879 355 889 329 930 330 940 357 912 388Z" fill="url(#skin)"/>
+  <path d="M884 345Q908 365 935 347L940 356 914 378 878 359Z" fill="url(#gold)"/>
+  <path d="M876 286C875 265 935 251 945 288L940 320Q928 348 909 346Q889 339 881 317Z" fill="url(#skin)"/>
+  <path d="M873 297C858 264 884 239 912 246C942 240 963 270 944 307L937 279C918 280 903 265 891 279L884 305Z" fill="#132332"/>
+  <path d="M888 300Q896 294 903 300M919 299Q926 294 933 298" fill="none" stroke="#51454b" stroke-width="2"/>
+  <path d="M897 302 900 302M922 301 926 300" stroke="#172637" stroke-width="2.5"/>
+  <path d="M913 301 909 316 916 318M902 329Q912 333 922 327" fill="none" stroke="#855f5d" stroke-width="1.5"/>
+  <path d="M876 276 882 251 899 262 911 233 924 262 941 251 946 278" fill="none" stroke="url(#gold)" stroke-width="4"/>
+  <path d="M911 252 906 264 912 275 918 264Z" fill="#d9ead2"/>
+  <!-- Extended hands gather distinct interface strands without dissolving island boundaries. -->
+  <path d="M879 366C862 355 849 366 827 389L781 412 729 391 721 401C744 423 766 437 785 434C813 431 855 411 872 395Z" fill="url(#skin)"/>
+  <path d="M729 391 716 379 699 378 698 383 711 387 702 391 685 388 682 393 704 402 721 401Z" fill="url(#skin)"/>
+  <path d="M942 366C959 355 975 369 990 394L1041 425 1093 399 1100 410C1081 433 1057 450 1038 447C1007 441 971 423 953 400Z" fill="url(#skin)"/>
+  <path d="M1093 399 1105 386 1121 382 1124 386 1112 394 1124 394 1136 387 1140 392 1123 407 1100 410Z" fill="url(#skin)"/>
+  <path d="M849 373 865 395M973 381 958 397" stroke="url(#gold)" stroke-width="6"/>
+  <g fill="none" stroke="#d3e8cb">
+    <path d="M371 558C522 610 565 320 708 392S996 561 1120 399S1280 291 1289 353M632 564C688 634 685 440 708 392M1120 399C1190 465 1125 649 1210 624" stroke-width="8" opacity=".16" filter="url(#glow)"/>
+    <path d="M371 558C522 610 565 320 708 392S996 561 1120 399S1280 291 1289 353" stroke-width="1.6"/>
+    <path d="M632 564C688 634 685 440 708 392M1120 399C1190 465 1125 649 1210 624" stroke-width="1.3"/>
+    <path d="M372 561C528 632 574 333 708 397S1008 579 1120 405S1272 304 1289 357" stroke="#cda770" stroke-width="1" opacity=".65"/>
+  </g>
+  <g fill="#edf2ce"><circle cx="708" cy="393" r="4"/><circle cx="1120" cy="400" r="4"/><circle cx="371" cy="558" r="3"/><circle cx="1210" cy="624" r="3"/></g>
+  <!-- ENGRAM memory lantern: suspended archive leaves around a warm living flame. -->
+  <g id="engram-lantern" aria-label="ENGRAM memory lantern" transform="translate(674 299)">
+    <circle r="103" fill="url(#lamp)"/>
+    <path d="M-13-40C-24-64 23-66 14-40M0-62V-91" fill="none" stroke="url(#gold)" stroke-width="3"/>
+    <path d="M-30-27 -18-42 17-42 30-27 24 39 0 53 -25 39Z" fill="#132a31" stroke="url(#gold)" stroke-width="3"/>
+    <path d="M-21-22 20-22 15 32 0 41 -17 31Z" fill="url(#lamp)"/>
+    <path d="M0-25V43M-27-26H28M-24 34H22" stroke="#d9bd82" stroke-width="2"/>
+    <path d="M-10 15Q-19-1-3-17Q-4-2 8 0Q20 16 0 28Z" fill="#ffedbf"/>
+    <g fill="none" stroke="#e7cb91" opacity=".65"><path d="M-49-11 -66-17 -70 8 -52 14ZM42-26 59-32 66-7 49-1Z"/><path d="M-62-8 -55-6M-63-2 -56 0M49-21 57-24M51-15 59-18"/></g>
+    <text y="81" fill="#d5c59f" font-family="Arial, sans-serif" font-size="12" letter-spacing="3" text-anchor="middle">ENGRAM</text>
+  </g>
+  <!-- FORGE hammer: copper-capped steel and a wrapped haft, with sparks of construction. -->
+  <g id="forge-hammer" aria-label="FORGE forge hammer" transform="translate(1087 629)">
+    <g transform="rotate(24)">
+      <path d="M-7-34H9V64L1 73 -8 64Z" fill="#685446" stroke="#b5a077" stroke-width="2"/>
+      <path d="M-7 4 9-3M-7 17 9 10M-7 30 9 23M-7 43 9 36M-7 56 9 49" stroke="#c2b493" stroke-width="3"/>
+      <path d="M-48-73 41-73 50-61 45-30 -42-30 -52-40Z" fill="url(#stone)" stroke="url(#gold)" stroke-width="3"/>
+      <path d="M-48-73 -39-82 48-82 50-61 41-73Z" fill="#a4b3a6"/>
+      <path d="M-42-70V-33M36-70V-33" stroke="#cda16d" stroke-width="9"/>
+      <path d="M-11-52H13M1-63V-41" stroke="#d5ccac" stroke-width="2"/>
+    </g>
+    <g stroke="#d1aa76"><path d="M-53-46 -65-51M-42-69 -45-79M57-13 68-8M45-82 52-93"/></g>
+    <text y="102" fill="#d5c59f" font-family="Arial, sans-serif" font-size="12" letter-spacing="3" text-anchor="middle">FORGE</text>
+  </g>
+  <!-- CRUCIBLE audit mirror: an oblique silver surface reflects the crossing strands. -->
+  <g id="crucible-mirror" aria-label="CRUCIBLE audit mirror" transform="translate(1197 260) rotate(12)">
+    <path d="M-5 47 -8 91Q0 102 8 91L5 47" fill="url(#gold)"/>
+    <ellipse rx="41" ry="58" fill="url(#gold)"/>
+    <ellipse rx="34" ry="50" fill="url(#mirror)" stroke="#c6d6be" stroke-width="2"/>
+    <path d="M-24 19Q0-31 23-20M-27 29Q0-21 27-10" stroke="#e9efcd" opacity=".7" fill="none"/>
+    <path d="M-16-41 -27-17M-9-44 -29-7" stroke="#e5ead1" stroke-width="2" opacity=".65"/>
+    <path d="M-39-14 -46 0 -39 14M39-14 46 0 39 14M-8-57 0-68 8-57" fill="none" stroke="#c2aa79" stroke-width="2"/>
+    <text transform="rotate(-12)" x="12" y="121" fill="#d5c59f" font-family="Arial, sans-serif" font-size="12" letter-spacing="3" text-anchor="middle">CRUCIBLE</text>
+  </g>
+  <path d="M0 692H1600V900H0Z" fill="url(#fade)"/>
+  <!-- Editorial title is kept in quiet negative space, outside the domain scene. -->
+  <text x="104" y="308" fill="#edf0df" font-family="Georgia, 'Times New Roman', serif" font-size="109" letter-spacing="-3">envora</text>
+  <path d="M108 339H185" stroke="#c6a477" stroke-width="2"/>
+  <text x="108" y="384" fill="#c7d5cd" font-family="Arial, sans-serif" font-size="16">Reason across repositories. Respect every boundary.</text>
+  <text x="108" y="815" fill="#819d9f" font-family="Arial, sans-serif" font-size="12" letter-spacing="4">THE BOUNDARY WEAVER</text>
+  <path d="M108 839H1492" stroke="#809d9c" stroke-opacity=".2"/>
+</svg>
