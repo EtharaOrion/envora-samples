@@ -115,3 +115,9 @@ See the preserved [LICENSE](LICENSE). Dataset and upstream repository licenses r
 ## Contact
 
 Find the team at [Ethara.AI on GitHub](https://github.com/EtharaOrion). Report security or benchmark-integrity concerns to [security@ethara.ai](mailto:security@ethara.ai) under [SECURITY.md](SECURITY.md). Use [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution route.
+
+---
+
+## Copyright
+
+Copyright (c) 2026 Green Rider Technology LLP (Ethara AI). All rights reserved.
